@@ -196,4 +196,3 @@ export function complete(input: string): { value?: string; options?: string[] } 
   return matches.length > 1 ? { options: matches } : {}
 }
 
-export const quickCommands = ["help", "whoami", "about", "skills", "projects", "education", "experience", "contact", "socials", "cv", "theme dark", "theme light", "date", "sudo", "gui", "clear"]

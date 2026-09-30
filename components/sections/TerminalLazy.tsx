@@ -2,13 +2,17 @@
 
 import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
+import { QuickCommands } from "./QuickCommands"
 import { TerminalFrame } from "./TerminalFrame"
 
 function Placeholder() {
   return (
-    <TerminalFrame>
-      <p className="p-4 text-[#9AA4B2]">Loading terminal…</p>
-    </TerminalFrame>
+    <div>
+      <TerminalFrame>
+        <p className="p-4 text-[#9AA4B2]">Loading terminal…</p>
+      </TerminalFrame>
+      <QuickCommands />
+    </div>
   )
 }
 

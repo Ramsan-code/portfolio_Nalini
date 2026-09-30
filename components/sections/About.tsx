@@ -65,7 +65,7 @@ export function About() {
           intro="A quick look at who I am, the tools I reach for and how I work with people."
         />
 
-        <div className="grid grid-flow-dense gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-flow-dense grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Bio */}
           <Tile
             title="About me"
@@ -129,7 +129,7 @@ export function About() {
                 <li key={tool}>
                   <Badge
                     variant={i === 0 ? "default" : "outline"}
-                    className="h-7 rounded-full px-3 font-mono text-xs font-normal"
+                    className="h-auto min-h-7 rounded-full px-3 font-mono text-xs font-normal whitespace-normal"
                   >
                     {tool}
                   </Badge>
@@ -193,7 +193,7 @@ export function About() {
                       <ul className="flex flex-wrap gap-1.5">
                         {group.items.map((item) => (
                           <li key={item}>
-                            <Badge variant="secondary" className="rounded-full font-mono text-xs font-normal">
+                            <Badge variant="secondary" className="h-auto rounded-full font-mono text-xs font-normal whitespace-normal">
                               {item}
                             </Badge>
                           </li>
@@ -216,7 +216,7 @@ export function About() {
               <ul className="flex flex-wrap gap-2">
                 {businessCompetencies.map((c) => (
                   <li key={c}>
-                    <Badge variant="outline" className="h-7 rounded-full px-3 text-xs font-normal">
+                    <Badge variant="outline" className="h-auto min-h-7 rounded-full px-3 text-xs font-normal whitespace-normal">
                       {c}
                     </Badge>
                   </li>

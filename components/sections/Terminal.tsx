@@ -3,10 +3,11 @@
 import { useTheme } from "next-themes"
 import { useEffect, useRef, useState, type KeyboardEvent } from "react"
 import { profile } from "@/data/profile"
-import { complete, quickCommands, runCommand, type TerminalEffect } from "@/lib/terminal-commands"
+import { complete, runCommand, type TerminalEffect } from "@/lib/terminal-commands"
 import { scrollToTarget } from "@/lib/scroll"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { clearLines, pushLines, recordCommand, type TerminalLine } from "@/store/terminalSlice"
+import { QuickCommands } from "./QuickCommands"
 import { TerminalFrame } from "./TerminalFrame"
 
 const PROMPT = "guest@nalini:~$"
@@ -238,24 +239,7 @@ export default function Terminal() {
         </div>
       </TerminalFrame>
 
-      <div className="mt-4">
-        <p id="quick-commands-label" className="mb-2 text-sm text-muted-foreground">
-          Or tap a command:
-        </p>
-        <ul aria-labelledby="quick-commands-label" className="flex flex-wrap gap-2">
-          {quickCommands.map((cmd) => (
-            <li key={cmd}>
-              <button
-                type="button"
-                onClick={() => execute(cmd)}
-                className="min-h-9 rounded-full border bg-surface px-3 font-mono text-xs text-muted-foreground transition-colors duration-150 hover:border-primary/60 hover:text-foreground"
-              >
-                {cmd}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <QuickCommands onRun={execute} />
     </div>
   )
 }

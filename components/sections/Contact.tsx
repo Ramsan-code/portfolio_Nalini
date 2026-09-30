@@ -22,7 +22,7 @@ export function Contact() {
           intro="Have a project, a role or just a question? Send a message and I'll reply as soon as I can."
         />
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
               {cards.map((c) => {
                 const Icon = c.icon
@@ -33,7 +33,7 @@ export function Contact() {
                     </span>
                     <span className="min-w-0">
                       <span className="block font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{c.label}</span>
-                      <span className="block font-medium break-words">{c.value}</span>
+                      <span className="block font-medium [overflow-wrap:anywhere]">{c.value}</span>
                     </span>
                   </>
                 )
@@ -83,7 +83,7 @@ export function Contact() {
             )}
           </div>
 
-          <div data-reveal className="relative rounded-2xl border bg-surface p-5 sm:p-8">
+          <div data-reveal className="relative min-w-0 rounded-2xl border bg-surface p-5 sm:p-8">
             <h3 className="mb-6 font-display text-xl font-semibold">Send a message</h3>
             <ContactFormLazy email={profile.email} />
           </div>

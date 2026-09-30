@@ -5,12 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npx serve out",
+    "start": "serve out -l 4000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "images": "node scripts/assets.mjs",
     "contrast": "node scripts/contrast.mjs",
-    "test": "playwright test"
+    "qa": "node scripts/qa.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
