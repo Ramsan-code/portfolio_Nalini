@@ -4,6 +4,7 @@ import { Hero } from "@/components/sections/Hero"
 import { Work } from "@/components/sections/Work"
 import { Process } from "@/components/sections/Process"
 import { TerminalSection } from "@/components/sections/TerminalSection"
+import { Contact } from "@/components/sections/Contact"
 import { Services } from "@/components/sections/Services"
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
       <Work />
       <Process />
       <TerminalSection />
+      <Contact />
     </>
   )
 }

@@ -128,7 +128,7 @@ export function Hero() {
                   alt={img.alt}
                   width={img.width}
                   height={img.height}
-                  preload
+                  loading="eager"
                   fetchPriority="high"
                   sizes="(min-width: 1024px) 320px, (min-width: 640px) 256px, 208px"
                   className="size-full object-cover"

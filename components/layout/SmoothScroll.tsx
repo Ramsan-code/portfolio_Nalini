@@ -21,7 +21,16 @@ export function SmoothScroll() {
     const tick = (time: number) => lenis.raf(time * 1000)
     gsap.ticker.add(tick)
     gsap.ticker.lagSmoothing(0)
+    // Keep ScrollTrigger positions fresh when the page height changes (fonts, lazy sections)
+    let timer = 0
+    const ro = new ResizeObserver(() => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => ScrollTrigger.refresh(), 200)
+    })
+    ro.observe(document.body)
     return () => {
+      ro.disconnect()
+      window.clearTimeout(timer)
       gsap.ticker.remove(tick)
       lenis.destroy()
       setLenis(null)
