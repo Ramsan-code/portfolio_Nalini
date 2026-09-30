@@ -6,7 +6,9 @@ import { GithubIcon } from "@/components/icons/BrandIcons"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { Project } from "@/data/types"
+import { usePointerTilt } from "@/hooks/usePointerTilt"
 import { asset } from "@/lib/site"
+import { useRef } from "react"
 
 export const categoryLabel: Record<Project["category"], string> = {
   web: "Web",
@@ -21,9 +23,11 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onOpen }: ProjectCardProps) {
   const open = (e: React.MouseEvent<HTMLElement>) => onOpen(project, e.currentTarget)
+  const ref = useRef<HTMLElement>(null)
+  usePointerTilt(ref, 8)
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border bg-surface transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 focus-within:border-primary/50">
+    <article ref={ref} className="tilt-card group flex h-full flex-col overflow-hidden rounded-2xl border bg-surface transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 focus-within:border-primary/50">
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
         <Image
           src={asset(project.cover.src)}
@@ -34,6 +38,8 @@ export function ProjectCard({ project, onOpen }: ProjectCardProps) {
           sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
           className="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
+        {/* Moving glare (decorative) */}
+        <span aria-hidden="true" className="tilt-glare pointer-events-none absolute inset-0" />
         {/* Hover / keyboard-focus overlay (fine pointers). Touch users get the row below. */}
         <div className="absolute inset-0 hidden items-end gap-2 bg-gradient-to-t from-black/75 via-black/20 to-transparent p-4 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 pointer-fine:flex">
           <ActionButtons project={project} onDetails={open} overlay />

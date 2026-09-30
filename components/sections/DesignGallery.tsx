@@ -3,7 +3,8 @@
 import { ZoomIn } from "lucide-react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
-import { useRef, useState } from "react"
+import { useRef, useState, type ReactNode } from "react"
+import { usePointerTilt } from "@/hooks/usePointerTilt"
 import type { DesignItem } from "@/data/types"
 import { asset } from "@/lib/site"
 
@@ -19,16 +20,14 @@ export function DesignGallery({ items }: { items: DesignItem[] }) {
       <ul className="columns-2 gap-4 sm:columns-3 lg:columns-4">
         {items.map((item, i) => (
           <li key={item.id} className="mb-4 break-inside-avoid" data-reveal>
-            <button
-              ref={(el) => {
+            <DepthButton
+              buttonRef={(el) => {
                 triggers.current[i] = el
               }}
-              type="button"
               onClick={() => {
                 setIndex(i)
                 setOpen(true)
               }}
-              className="group relative block w-full overflow-hidden rounded-xl border bg-surface"
             >
               <Image
                 src={asset(item.thumb.src)}
@@ -44,7 +43,7 @@ export function DesignGallery({ items }: { items: DesignItem[] }) {
                 <ZoomIn className="size-4 shrink-0" aria-hidden="true" />
               </span>
               <span className="sr-only">Open {item.title} full size</span>
-            </button>
+            </DepthButton>
           </li>
         ))}
       </ul>
@@ -62,5 +61,32 @@ export function DesignGallery({ items }: { items: DesignItem[] }) {
         />
       )}
     </>
+  )
+}
+
+/** Thumbnail button with a slight pointer-driven depth parallax on its image. */
+function DepthButton({
+  buttonRef,
+  onClick,
+  children,
+}: {
+  buttonRef: (el: HTMLButtonElement | null) => void
+  onClick: () => void
+  children: ReactNode
+}) {
+  const ref = useRef<HTMLButtonElement | null>(null)
+  usePointerTilt(ref)
+  return (
+    <button
+      ref={(el) => {
+        ref.current = el
+        buttonRef(el)
+      }}
+      type="button"
+      onClick={onClick}
+      className="depth-thumb group relative block w-full overflow-hidden rounded-xl border bg-surface"
+    >
+      {children}
+    </button>
   )
 }

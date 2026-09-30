@@ -3,6 +3,7 @@ import Image from "next/image"
 import { socialIcons } from "@/components/icons/BrandIcons"
 import { Button } from "@/components/ui/button"
 import { profile, socials, visibility } from "@/lib/content"
+import { HeroStage } from "@/components/three/HeroStage"
 import { asset } from "@/lib/site"
 
 export function Hero() {
@@ -111,6 +112,7 @@ export function Hero() {
         {/* Portrait with rotating conic ring */}
         <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
           <div className="animate-float relative size-52 will-change-transform sm:size-64 lg:size-80">
+            <HeroStage />
             <div data-hero-ring aria-hidden="true" className="absolute -inset-1.5">
               <div className="ring-conic animate-spin-slow size-full rounded-full opacity-90 blur-[1px] will-change-transform" />
             </div>
