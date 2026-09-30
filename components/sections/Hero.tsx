@@ -11,10 +11,6 @@ export function Hero() {
     <section id="home" aria-labelledby="hero-title" className="relative isolate overflow-hidden">
       {/* Decorative background */}
       <div aria-hidden="true" className="bg-grid absolute inset-0 -z-10" />
-      <div
-        aria-hidden="true"
-        className="absolute -top-40 right-[-10rem] -z-10 size-[32rem] rounded-full opacity-25 blur-3xl bg-gradient-brand"
-      />
 
       <div className="container-page grid items-center gap-12 pt-12 pb-20 sm:pt-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pt-24 lg:pb-28">
         <div className="order-2 lg:order-1">

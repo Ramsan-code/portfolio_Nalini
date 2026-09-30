@@ -3,6 +3,8 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google"
 import { Footer } from "@/components/layout/Footer"
 import { Navbar } from "@/components/layout/Navbar"
 import { SmoothScroll } from "@/components/layout/SmoothScroll"
+import { AmbientBackground } from "@/components/animations/AmbientBackground"
+import { EffectsLoader } from "@/components/animations/EffectsLoader"
 import { RevealOnScroll } from "@/components/motion/RevealOnScroll"
 import { LazyToaster } from "@/components/providers/LazyToaster"
 import { ReduxProvider } from "@/components/providers/ReduxProvider"
@@ -12,6 +14,7 @@ import { buildJsonLd } from "@/lib/jsonld"
 import { absoluteUrl, basePath, siteDescription, siteTitle, siteUrl, THEME_COLORS } from "@/lib/site"
 import { profile } from "@/data/profile"
 import "./globals.css"
+import "./animations.css"
 
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -70,9 +73,11 @@ export const viewport: Viewport = {
   colorScheme: "dark light",
 }
 
-// Runs before paint: only when motion is allowed, mark <html> so reveal
-// targets start hidden. If the animation code never loads, un-hide after 4s.
-const motionScript = `(function(){try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){var d=document.documentElement;d.classList.add('motion-ok');setTimeout(function(){if(!window.__nrReveal)d.classList.remove('motion-ok')},4000)}}catch(e){}})()`
+// Runs before paint:
+// 1. Applies the "Reduce effects" preference (html[data-effects="reduced"]).
+// 2. Only when motion is allowed, marks <html> so reveal targets start hidden;
+//    if the animation code never loads, un-hides them after 4s.
+const motionScript = `(function(){try{var d=document.documentElement;try{if(localStorage.getItem('nr-effects')==='reduced')d.dataset.effects='reduced'}catch(e){}if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('motion-ok');setTimeout(function(){if(!window.__nrReveal)d.classList.remove('motion-ok')},4000)}}catch(e){}})()`
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const jsonLd = buildJsonLd()
@@ -98,6 +103,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             >
               Skip to content
             </a>
+            <AmbientBackground />
             <Navbar />
             <main id="main" tabIndex={-1} className="outline-none">
               {children}
@@ -107,6 +113,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <LazyToaster />
             <SmoothScroll />
             <RevealOnScroll />
+            <EffectsLoader />
           </ReduxProvider>
         </ThemeProvider>
       </body>

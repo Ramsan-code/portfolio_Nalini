@@ -1,0 +1,80 @@
+/* ==================================================================
+   Motion & decorative layers. Everything here animates transform,
+   opacity or filter only, and is disabled by prefers-reduced-motion
+   and/or html[data-effects="reduced"] ("Reduce effects" toggle).
+   ================================================================== */
+
+/* ---------------- Ambient background ----------------
+   Peak blob alpha is capped (--blob-alpha) so text on glass stays AA:
+   see scripts/glass-contrast.mjs before raising it. */
+:root {
+  --blob-alpha: 0.06;
+  --blob-1: 15 118 110; /* teal   #0F766E */
+  --blob-2: 128 0 0; /* maroon #800000 */
+  --blob-3: 126 34 206; /* purple #7E22CE */
+  --blob-4: 29 78 216; /* blue   #1D4ED8 */
+}
+.dark {
+  --blob-alpha: 0.2;
+  --blob-1: 45 212 191; /* teal   #2DD4BF */
+  --blob-2: 176 48 74; /* maroon #B0304A */
+  --blob-3: 168 85 247; /* purple #A855F7 */
+  --blob-4: 244 114 182; /* pink   #F472B6 */
+}
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.ambient-parallax {
+  position: absolute;
+  inset: -80px 0; /* room for the ≤60px scroll parallax */
+  will-change: transform;
+}
+.ambient-blob {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  /* Radial gradients instead of filter: blur() — same softness, far cheaper */
+  background: radial-gradient(closest-side, rgb(var(--c) / var(--blob-alpha)), rgb(var(--c) / 0));
+  will-change: transform;
+  animation: var(--anim) ease-in-out infinite alternate;
+  transition: background 400ms ease;
+}
+.ambient-blob-1 { --c: var(--blob-1); --anim: blob-a 26s; top: -25vmax; left: -20vmax; }
+.ambient-blob-2 { --c: var(--blob-2); --anim: blob-b 34s; top: 10vh; right: -30vmax; }
+.ambient-blob-3 { --c: var(--blob-3); --anim: blob-c 40s; bottom: -35vmax; left: 10vw; }
+.ambient-blob-4 { --c: var(--blob-4); --anim: blob-b 22s reverse; top: 40vh; left: -30vmax; width: 50vmax; height: 50vmax; }
+
+@keyframes blob-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(12vw, 8vh, 0) scale(1.15); }
+}
+@keyframes blob-b {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(-14vw, 10vh, 0) scale(0.95); }
+}
+@keyframes blob-c {
+  from { transform: translate3d(0, 0, 0) scale(0.95); }
+  to { transform: translate3d(8vw, -12vh, 0) scale(1.1); }
+}
+
+/* Paused while the tab is hidden (set by AmbientParallax) */
+html[data-tab-hidden] .ambient-blob {
+  animation-play-state: paused;
+}
+/* Reduce effects: no blobs at all */
+html[data-effects="reduced"] .ambient {
+  display: none;
+}
+/* Reduced motion: keep the colour, drop the movement */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-blob {
+    animation: none;
+  }
+}

@@ -7,6 +7,11 @@ let lenis: Lenis | null = null
 
 export function setLenis(instance: Lenis | null) {
   lenis = instance
+  window.dispatchEvent(new Event("nr-lenis"))
+}
+
+export function getLenis(): Lenis | null {
+  return lenis
 }
 
 /** Scroll to a selector/element/position, via Lenis when it is running. */
