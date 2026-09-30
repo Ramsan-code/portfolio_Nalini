@@ -1,16 +1,25 @@
 "use client"
 
 import { AmbientParallax } from "./AmbientParallax"
+import { Magnetic } from "./Magnetic"
+import { SplitHeadings } from "./SplitHeadings"
+import { SpotlightTracker } from "./SpotlightTracker"
+import { TimelineScrub } from "./TimelineScrub"
 
 /**
  * Lazy chunk (see EffectsLoader) containing GSAP and every GSAP-driven,
- * purely decorative enhancer. Only mounted when rich motion is allowed, so
- * unmounting it (effects toggled off) reverts everything via useGSAP.
+ * decorative enhancer. They attach to data attributes, so sections stay
+ * server components. Only mounted when rich motion is allowed; unmounting
+ * (e.g. "Reduce effects" switched on) reverts everything via useGSAP.
  */
 export default function EffectsRuntime() {
   return (
     <>
       <AmbientParallax />
+      <SplitHeadings />
+      <TimelineScrub />
+      <Magnetic />
+      <SpotlightTracker />
     </>
   )
 }

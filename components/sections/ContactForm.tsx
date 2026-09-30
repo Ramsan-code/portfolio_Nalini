@@ -138,7 +138,7 @@ export function ContactForm({ email }: { email: string }) {
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Button type="submit" size="lg" disabled={sending} className="h-12 rounded-full px-7 text-base">
+          <Button type="submit" size="lg" data-magnetic disabled={sending} className="h-12 rounded-full px-7 text-base">
             {sending ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Send aria-hidden="true" />}
             {sending ? "Sending…" : "Send message"}
           </Button>

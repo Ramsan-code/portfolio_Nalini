@@ -11,7 +11,7 @@ export function TerminalSection() {
           title="Prefer the command line?"
           intro="Explore the same portfolio from a terminal. Everything here comes from the same data as the rest of the site."
         />
-        <div data-reveal className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-3xl">
           <TerminalLazy />
         </div>
       </div>

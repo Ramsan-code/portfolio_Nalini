@@ -26,6 +26,7 @@ export function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`${s.label} (opens in a new tab)`}
+                      data-magnetic
                       className="grid size-10 place-items-center rounded-full border text-muted-foreground transition-colors duration-150 hover:border-primary hover:text-primary"
                     >
                       <Icon className="size-4" />

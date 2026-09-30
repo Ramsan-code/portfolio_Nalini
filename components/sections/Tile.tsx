@@ -18,7 +18,7 @@ export function Tile({ title, icon, className, variant = "default", children }: 
       as="article"
       variant={variant}
       spotlight
-      data-reveal
+     
       className={cn("group/tile flex flex-col p-6 transition-colors duration-200 hover:border-primary/40", className)}
     >
       <h3 className="mb-4 flex items-center gap-2 font-mono text-xs font-normal uppercase tracking-[0.18em] text-muted-foreground">

@@ -38,12 +38,12 @@ export function Hero() {
           <div data-hero style={{ "--i": 3 } as React.CSSProperties} className="mt-8 flex flex-col gap-3 sm:flex-row">
             {visibility.work ? (
               <>
-                <Button asChild size="lg" className="h-12 rounded-full px-6 text-base">
+                <Button asChild size="lg" data-magnetic className="h-12 rounded-full px-6 text-base">
                   <a href="#work">
                     View My Projects <ArrowRight aria-hidden="true" />
                   </a>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-6 text-base">
+                <Button asChild size="lg" data-magnetic variant="outline" className="h-12 rounded-full px-6 text-base">
                   <a href="#contact">
                     <MessageSquare aria-hidden="true" /> Let&apos;s Talk
                   </a>
@@ -51,12 +51,12 @@ export function Hero() {
               </>
             ) : (
               <>
-                <Button asChild size="lg" className="h-12 rounded-full px-6 text-base">
+                <Button asChild size="lg" data-magnetic className="h-12 rounded-full px-6 text-base">
                   <a href="#contact">
                     <MessageSquare aria-hidden="true" /> Let&apos;s Talk
                   </a>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-6 text-base">
+                <Button asChild size="lg" data-magnetic variant="outline" className="h-12 rounded-full px-6 text-base">
                   <a href="#about">
                     About Me <ArrowRight aria-hidden="true" />
                   </a>
@@ -96,6 +96,7 @@ export function Hero() {
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label={`${s.label} (opens in a new tab)`}
+                          data-magnetic
                           className="grid size-11 place-items-center rounded-full border bg-surface/70 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:border-primary hover:text-primary"
                         >
                           <Icon className="size-[18px]" />

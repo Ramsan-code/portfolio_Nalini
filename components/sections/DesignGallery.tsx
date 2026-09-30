@@ -19,7 +19,7 @@ export function DesignGallery({ items }: { items: DesignItem[] }) {
     <>
       <ul className="columns-2 gap-4 sm:columns-3 lg:columns-4">
         {items.map((item, i) => (
-          <li key={item.id} className="mb-4 break-inside-avoid" data-reveal>
+          <li key={item.id} className="mb-4 break-inside-avoid">
             <DepthButton
               buttonRef={(el) => {
                 triggers.current[i] = el

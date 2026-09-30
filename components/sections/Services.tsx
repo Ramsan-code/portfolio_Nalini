@@ -29,7 +29,7 @@ export function Services() {
           {services.map((service) => {
             const Icon = icons[service.icon]
             return (
-              <li key={service.title} data-reveal>
+              <li key={service.title}>
                 <GlassCard spotlight className="group flex h-full flex-col gap-4 py-6 text-card-foreground transition-[translate,border-color] duration-200 hover:-translate-y-1 hover:border-primary/50">
                   <CardHeader>
                     <span className="mb-3 grid size-12 place-items-center rounded-xl bg-accent text-primary transition-colors duration-200 group-hover:bg-primary group-hover:text-primary-foreground">

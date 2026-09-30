@@ -38,7 +38,7 @@ export function HeroStage() {
         typeof window.requestIdleCallback === "function"
           ? window.requestIdleCallback(decide, { timeout: 2000 })
           : window.setTimeout(decide, 200)
-    }, 1100) // CSS hero intro: last element ends at ~1.04s
+    }, document.documentElement.classList.contains("show-preloader") ? 2100 : 1100) // after the CSS hero intro (+ preloader)
     return () => {
       cancelled = true
       window.clearTimeout(afterIntro)

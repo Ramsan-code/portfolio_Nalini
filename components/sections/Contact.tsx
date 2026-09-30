@@ -39,7 +39,7 @@ export function Contact() {
                 )
                 const cls = "group flex items-center gap-4 rounded-2xl border bg-surface p-4 transition-colors duration-200"
                 return (
-                  <li key={c.label} data-reveal>
+                  <li key={c.label}>
                     {"href" in c ? (
                       <a
                         href={c.href}
@@ -58,7 +58,7 @@ export function Contact() {
             </ul>
 
             {socials.length > 0 && (
-              <div data-reveal className="pt-2">
+              <div className="pt-2">
                 <h3 className="mb-3 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Find me on</h3>
                 <ul className="flex flex-wrap gap-2">
                   {socials.map((s) => {
@@ -69,6 +69,7 @@ export function Contact() {
                           href={s.url}
                           target="_blank"
                           rel="noopener noreferrer"
+                          data-magnetic
                           className="inline-flex min-h-11 items-center gap-2 rounded-full border bg-surface px-4 text-sm font-medium transition-colors duration-150 hover:border-primary hover:text-primary"
                         >
                           <Icon className="size-4" />
@@ -83,7 +84,7 @@ export function Contact() {
             )}
           </div>
 
-          <div data-reveal data-spotlight className="glass-strong glass-edge min-w-0 rounded-2xl p-5 sm:p-8">
+          <div data-spotlight className="glass-strong glass-edge min-w-0 rounded-2xl p-5 sm:p-8">
             <h3 className="mb-6 font-display text-xl font-semibold">Send a message</h3>
             <ContactFormLazy email={profile.email} />
           </div>

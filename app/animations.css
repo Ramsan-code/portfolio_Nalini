@@ -4,6 +4,89 @@
    and/or html[data-effects="reduced"] ("Reduce effects" toggle).
    ================================================================== */
 
+/* ---------------- Base keyframes (used by @theme --animate-*) ---------------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ---------------- Scroll reveal + hero intro ---------------- */
+/* Reveal: content is visible by default. Only when motion is allowed does
+   <html> get .motion-ok (inline head script); RevealOnScroll then adds
+   .is-revealed as each element enters the viewport. */
+.motion-ok [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.motion-ok [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .motion-ok [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Lenis recommended styles */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* Hero intro: one CSS sequence (no JS on the critical path). Elements are
+   staggered by --i. Never applied to the h1 or the portrait, so the LCP
+   element paints immediately. */
+.motion-ok [data-hero] {
+  animation: hero-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 90ms + 80ms);
+}
+.motion-ok [data-hero-ring] {
+  animation: ring-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ring-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Gradient sweep on the role line: plays once after the intro */
+.role-shimmer {
+  background-size: 200% auto;
+  background-position: 100% 50%;
+}
+.motion-ok .role-shimmer {
+  animation:
+    hero-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both,
+    shimmer 2.4s ease-out 0.5s both;
+  animation-delay: calc(var(--i, 0) * 90ms + 80ms), 0.5s;
+}
+@keyframes shimmer {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+
 /* ---------------- Ambient background ----------------
    Peak blob alpha is capped (--blob-alpha) so text on glass stays AA:
    see scripts/glass-contrast.mjs before raising it. */
@@ -102,4 +185,128 @@ html[data-effects="reduced"] .ambient {
     transform: translate3d(calc(var(--px, 0) * -6px), calc(var(--py, 0) * -6px), 0) scale(1.06);
     transition: transform 250ms ease-out;
   }
+}
+
+/* ---------------- Preloader (first visit per session, ≤ 1.2s) ---------------- */
+.preloader {
+  display: none;
+}
+html.show-preloader .preloader {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  animation: preloader-out 0s linear 1.2s forwards;
+}
+.preloader-half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  background: var(--bg);
+  will-change: transform;
+}
+.preloader-top,
+.preloader-bottom {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  animation-delay: 0.72s;
+  animation-fill-mode: forwards;
+}
+.preloader-top { top: 0; animation-name: preloader-split-up; }
+.preloader-bottom { bottom: 0; animation-name: preloader-split-down; }
+.preloader-mark {
+  position: absolute;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+}
+/* The same monogram in both halves, centred on the seam, so it splits in two */
+.preloader-top .preloader-mark { bottom: 0; transform: translate(-50%, 50%); }
+.preloader-bottom .preloader-mark { top: 0; transform: translate(-50%, -50%); }
+.preloader-mark path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: preloader-draw 0.55s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.preloader-mark path + path { animation-delay: 0.14s; }
+
+@keyframes preloader-draw { to { stroke-dashoffset: 0; } }
+@keyframes preloader-split-up { to { transform: translateY(-100%); } }
+@keyframes preloader-split-down { to { transform: translateY(100%); } }
+@keyframes preloader-out { to { visibility: hidden; } }
+
+/* Hero intro waits for the preloader to open */
+html.show-preloader.motion-ok [data-hero] {
+  animation-delay: calc(var(--i, 0) * 90ms + 1000ms);
+}
+html.show-preloader.motion-ok [data-hero-ring] {
+  animation-delay: 0.9s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.show-preloader .preloader { display: none; }
+}
+html[data-effects="reduced"] .preloader { display: none !important; }
+
+/* ---------------- Marquee (About) ---------------- */
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  border-radius: 0.75rem;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 60s linear infinite;
+}
+.marquee-list {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.75rem;
+  padding-right: 0.75rem;
+}
+.marquee-item {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid var(--glass-border);
+  background: color-mix(in oklab, var(--surface) 60%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track,
+.marquee:focus-visible .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+/* Static wrapped list: reduced motion or reduced effects */
+@media (prefers-reduced-motion: reduce) {
+  .marquee { mask-image: none; }
+  .marquee-track { animation: none; width: auto; }
+  .marquee-list { flex-wrap: wrap; flex-shrink: 1; }
+  .marquee-list[aria-hidden],
+  .marquee-item[aria-hidden] { display: none; }
+}
+html[data-effects="reduced"] .marquee { mask-image: none; }
+html[data-effects="reduced"] .marquee-track { animation: none; width: auto; }
+html[data-effects="reduced"] .marquee-list { flex-wrap: wrap; flex-shrink: 1; }
+html[data-effects="reduced"] .marquee-list[aria-hidden],
+html[data-effects="reduced"] .marquee-item[aria-hidden] { display: none; }
+
+/* ---------------- Micro-interactions ---------------- */
+/* Focus rings animate in (outline-offset + colour), 150ms */
+@media (prefers-reduced-motion: no-preference) {
+  :focus-visible {
+    animation: focus-ring-in 150ms ease-out;
+  }
+}
+@keyframes focus-ring-in {
+  from { outline-offset: 6px; outline-color: transparent; }
 }

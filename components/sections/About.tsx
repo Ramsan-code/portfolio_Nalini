@@ -12,6 +12,8 @@ import {
   Wrench,
   Zap,
 } from "lucide-react"
+import { CountUp } from "@/components/animations/CountUp"
+import { Marquee } from "@/components/animations/Marquee"
 import { Badge } from "@/components/ui/badge"
 import {
   businessCompetencies,
@@ -226,6 +228,15 @@ export function About() {
             </Tile>
           )}
 
+          {/* Stack & tools marquee (full width) */}
+          <Tile
+            title="Stack & tools"
+            icon={<Layers className="size-3.5 text-primary" aria-hidden="true" />}
+            className="sm:col-span-2 lg:col-span-4"
+          >
+            <Marquee items={[...tools, ...techStack.flatMap((g) => g.items)]} label="Tools and technologies" />
+          </Tile>
+
           {/* Stats */}
           {hasStats && (
             <Tile
@@ -237,7 +248,9 @@ export function About() {
                 {stats.map((s) => (
                   <div key={s.label} className="flex flex-col-reverse">
                     <dt className="text-sm text-muted-foreground">{s.label}</dt>
-                    <dd className="font-display text-3xl font-bold text-primary">{s.value}</dd>
+                    <dd className="font-display text-3xl font-bold text-primary">
+                      <CountUp value={s.value} />
+                    </dd>
                   </div>
                 ))}
               </dl>

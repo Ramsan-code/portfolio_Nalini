@@ -23,15 +23,15 @@ export function Work() {
 
         {visibility.design && (
           <div className="mt-24">
-            <h3 data-reveal className="mb-2 font-display text-2xl font-semibold">Design gallery</h3>
-            <p data-reveal className="mb-8 text-muted-foreground">Posters, banners and logos. Select one to view it full size.</p>
+            <h3 className="mb-2 font-display text-2xl font-semibold">Design gallery</h3>
+            <p className="mb-8 text-muted-foreground">Posters, banners and logos. Select one to view it full size.</p>
             <DesignGallery items={designWork} />
           </div>
         )}
 
         {visibility.testimonials && (
           <div className="mt-24">
-            <h3 data-reveal className="mb-8 font-display text-2xl font-semibold">Kind words</h3>
+            <h3 className="mb-8 font-display text-2xl font-semibold">Kind words</h3>
             <Testimonials items={testimonials} />
           </div>
         )}

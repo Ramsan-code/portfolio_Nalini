@@ -24,7 +24,7 @@ export function Process() {
           <div aria-hidden="true" className="bg-gradient-brand absolute top-7 right-[10%] left-[10%] hidden h-0.5 opacity-60 lg:block" />
           <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
           {steps.map(({ title, icon: Icon, text }, i) => (
-            <li key={title} data-reveal className="relative flex gap-4 lg:flex-col lg:items-center lg:text-center">
+            <li key={title} className="relative flex gap-4 lg:flex-col lg:items-center lg:text-center">
               <span className="relative z-10 grid size-14 shrink-0 place-items-center rounded-2xl border bg-surface text-primary shadow-sm">
                 <Icon className="size-6" aria-hidden="true" />
                 <span className="absolute -top-2 -right-2 grid size-6 place-items-center rounded-full bg-primary font-mono text-[0.7rem] text-primary-foreground">

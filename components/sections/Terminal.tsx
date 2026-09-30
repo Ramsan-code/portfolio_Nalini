@@ -3,6 +3,7 @@
 import { useTheme } from "next-themes"
 import { useEffect, useRef, useState, type KeyboardEvent } from "react"
 import { profile } from "@/data/profile"
+import { useRichMotion } from "@/lib/effects"
 import { complete, runCommand, type TerminalEffect } from "@/lib/terminal-commands"
 import { scrollToTarget } from "@/lib/scroll"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
@@ -36,6 +37,30 @@ function Linkified({ text }: { text: string }) {
   )
 }
 
+/** Types a line out quickly (≤ 350ms). Screen readers get the full text once. */
+function TypedLine({ text, delay }: { text: string; delay: number }) {
+  const [shown, setShown] = useState(0)
+  useEffect(() => {
+    let frame = 0
+    const start = performance.now() + delay
+    const duration = Math.min(350, Math.max(80, text.length * 8))
+    const tick = (now: number) => {
+      const t = (now - start) / duration
+      setShown(t <= 0 ? 0 : Math.min(text.length, Math.ceil(t * text.length)))
+      if (t < 1) frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [text, delay])
+  if (shown >= text.length) return <Linkified text={text} />
+  return (
+    <>
+      <span aria-hidden="true">{text.slice(0, shown)}</span>
+      <span className="sr-only">{text}</span>
+    </>
+  )
+}
+
 const lineColor: Record<TerminalLine["kind"], string> = {
   input: "text-[#F0EEE9]",
   output: "text-[#C9D1DB]",
@@ -45,6 +70,12 @@ const lineColor: Record<TerminalLine["kind"], string> = {
 
 export default function Terminal() {
   const lines = useAppSelector((s) => s.terminal.lines)
+  const nextId = useAppSelector((s) => s.terminal.nextId)
+  const rich = useRichMotion()
+  // Only output produced after this mount types out; a keypress completes it
+  const [typeAfter, setTypeAfter] = useState(nextId - 1)
+  // First line id of the latest command's output (stagger is measured from here)
+  const [batchStart, setBatchStart] = useState(nextId)
   const history = useAppSelector((s) => s.terminal.history)
   const dispatch = useAppDispatch()
   const { setTheme } = useTheme()
@@ -102,6 +133,7 @@ export default function Terminal() {
   }
 
   function execute(command: string) {
+    setBatchStart(nextId + 1)
     const cmd = command.trim()
     dispatch(pushLines([{ kind: "input", text: `${PROMPT} ${cmd}` }]))
     if (cmd) {
@@ -124,6 +156,7 @@ export default function Terminal() {
   }
 
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    setTypeAfter(nextId - 1) // any key: finish typing what's on screen
     if (e.key === "Enter") {
       e.preventDefault()
       execute(value)
@@ -188,7 +221,11 @@ export default function Terminal() {
           >
             {lines.map((line) => (
               <p key={line.id} className={`break-words whitespace-pre-wrap ${lineColor[line.kind]}`}>
-                <Linkified text={line.text} />
+                {rich && line.kind !== "input" && line.id > typeAfter ? (
+                  <TypedLine text={line.text} delay={Math.max(0, line.id - Math.max(batchStart, typeAfter + 1)) * 45} />
+                ) : (
+                  <Linkified text={line.text} />
+                )}
               </p>
             ))}
           </div>

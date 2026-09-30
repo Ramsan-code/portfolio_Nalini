@@ -4,7 +4,6 @@ import { certifications, mediumUsername, timeline } from "@/lib/content"
 import { cn } from "@/lib/utils"
 import { MediumFeedLazy } from "./MediumFeedLazy"
 import { SectionHeading } from "./SectionHeading"
-import { TimelineProgress } from "./TimelineProgress"
 
 export function Journey() {
   return (
@@ -20,7 +19,8 @@ export function Journey() {
         <div className="relative ml-3 sm:ml-4">
           {/* Track + scroll-driven progress */}
           <div aria-hidden="true" className="absolute top-2 bottom-2 -left-px w-0.5 rounded-full bg-border">
-            <TimelineProgress />
+            {/* Filled by TimelineScrub (scrubbed); shown full without motion */}
+            <div data-timeline-progress className="bg-gradient-brand absolute inset-0 origin-top rounded-full" />
           </div>
           <ol className="space-y-8">
 
@@ -93,12 +93,12 @@ export function Journey() {
 
         {certifications.length > 0 && (
           <div className="mt-20">
-            <h3 data-reveal className="mb-6 flex items-center gap-2 font-display text-2xl font-semibold">
+            <h3 className="mb-6 flex items-center gap-2 font-display text-2xl font-semibold">
               <Award className="size-6 text-primary" aria-hidden="true" /> Certifications
             </h3>
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {certifications.map((c) => (
-                <li key={c.title} data-reveal>
+                <li key={c.title}>
                   <article className="flex h-full flex-col rounded-2xl border bg-surface p-5">
                     <h4 className="font-display text-lg font-semibold">{c.title}</h4>
                     {c.issuer && <p className="text-sm text-muted-foreground">{c.issuer}</p>}
@@ -125,7 +125,7 @@ export function Journey() {
 
         {mediumUsername && (
           <div className="mt-20">
-            <h3 data-reveal className="mb-6 font-display text-2xl font-semibold">Latest writing</h3>
+            <h3 className="mb-6 font-display text-2xl font-semibold">Latest writing</h3>
             <MediumFeedLazy username={mediumUsername} />
           </div>
         )}

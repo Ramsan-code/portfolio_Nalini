@@ -1,11 +1,13 @@
 import { profile } from "@/data/profile"
 import { navLinks } from "@/lib/nav"
 import { Logo } from "./Logo"
+import { ScrollProgress } from "@/components/animations/ScrollProgress"
 import { NavClient } from "./NavClient"
 
 export function Navbar() {
   return (
     <header className="glass-nav sticky top-0 z-40">
+      <ScrollProgress />
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <a href="#home" className="flex items-center gap-2.5 rounded-lg" aria-label={`${profile.name}, back to top`}>
           <Logo />

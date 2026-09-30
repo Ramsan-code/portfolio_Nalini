@@ -5,7 +5,8 @@ import { Navbar } from "@/components/layout/Navbar"
 import { SmoothScroll } from "@/components/layout/SmoothScroll"
 import { AmbientBackground } from "@/components/animations/AmbientBackground"
 import { EffectsLoader } from "@/components/animations/EffectsLoader"
-import { RevealOnScroll } from "@/components/motion/RevealOnScroll"
+import { Preloader } from "@/components/animations/Preloader"
+import { RevealOnScroll } from "@/components/animations/RevealOnScroll"
 import { LazyToaster } from "@/components/providers/LazyToaster"
 import { ReduxProvider } from "@/components/providers/ReduxProvider"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
@@ -75,9 +76,10 @@ export const viewport: Viewport = {
 
 // Runs before paint:
 // 1. Applies the "Reduce effects" preference (html[data-effects="reduced"]).
-// 2. Only when motion is allowed, marks <html> so reveal targets start hidden;
-//    if the animation code never loads, un-hides them after 4s.
-const motionScript = `(function(){try{var d=document.documentElement;try{if(localStorage.getItem('nr-effects')==='reduced')d.dataset.effects='reduced'}catch(e){}if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('motion-ok');setTimeout(function(){if(!window.__nrReveal)d.classList.remove('motion-ok')},4000)}}catch(e){}})()`
+// 2. Only when motion is allowed: marks <html> so reveal targets start hidden
+//    (un-hidden after 4s if the animation code never loads), and shows the
+//    preloader on the first page view of the session (unless effects are reduced).
+const motionScript = `(function(){try{var d=document.documentElement,r=false;try{r=localStorage.getItem('nr-effects')==='reduced'}catch(e){}if(r)d.dataset.effects='reduced';if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('motion-ok');setTimeout(function(){if(!window.__nrReveal)d.classList.remove('motion-ok')},4000);if(!r){try{if(!sessionStorage.getItem('nr-preloaded')){sessionStorage.setItem('nr-preloaded','1');d.classList.add('show-preloader')}}catch(e){}}}}catch(e){}})()`
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const jsonLd = buildJsonLd()
@@ -103,6 +105,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             >
               Skip to content
             </a>
+            <Preloader />
             <AmbientBackground />
             <Navbar />
             <main id="main" tabIndex={-1} className="outline-none">
