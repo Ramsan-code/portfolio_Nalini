@@ -13,7 +13,17 @@ export function TimelineProgress() {
     if (!el || reduced) return
     let cancelled = false
     let cleanup: (() => void) | undefined
-    void import("@/lib/gsap").then(({ gsap, ScrollTrigger }) => {
+    // Load GSAP only once the timeline is about to be seen
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return
+        io.disconnect()
+        void init()
+      },
+      { rootMargin: "400px 0px" }
+    )
+    io.observe(el)
+    const init = () => import("@/lib/gsap").then(({ gsap, ScrollTrigger }) => {
       if (cancelled) return
       const ctx = gsap.context(() => {
         gsap.fromTo(
@@ -41,6 +51,7 @@ export function TimelineProgress() {
     })
     return () => {
       cancelled = true
+      io.disconnect()
       cleanup?.()
     }
   }, [reduced])

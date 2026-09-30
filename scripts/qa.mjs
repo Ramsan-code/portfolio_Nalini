@@ -305,10 +305,10 @@ for (const width of [360, 768, 1024, 1440]) {
     lenis: document.documentElement.classList.contains("lenis"),
     motionOk: document.documentElement.classList.contains("motion-ok"),
     hidden: [...document.querySelectorAll("[data-reveal],[data-hero],[data-hero-ring]")].filter((el) => getComputedStyle(el).opacity !== "1").length,
-    inline: [...document.querySelectorAll("[data-hero],[data-hero-ring]")].filter((el) => el.getAttribute("style")).length,
+    animated: [...document.querySelectorAll("[data-hero],[data-hero-ring]")].filter((el) => getComputedStyle(el).animationName !== "none").length,
   }))
   check("reduced motion: Lenis disabled", !state.lenis)
-  check("reduced motion: everything visible without animation", !state.motionOk && state.hidden === 0 && state.inline === 0, JSON.stringify(state))
+  check("reduced motion: everything visible without animation", !state.motionOk && state.hidden === 0 && state.animated === 0, JSON.stringify(state))
   await context.close()
 }
 

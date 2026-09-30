@@ -30,6 +30,8 @@ const mono = JetBrains_Mono({
   weight: ["400"],
   variable: "--font-jetbrains-mono",
   display: "swap",
+  // Only used for small labels; don't compete with the hero for bandwidth
+  preload: false,
 })
 
 export const metadata: Metadata = {

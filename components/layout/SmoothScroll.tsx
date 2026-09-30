@@ -16,17 +16,31 @@ export function SmoothScroll() {
     if (reduced) return
     let cancelled = false
     let destroy: (() => void) | undefined
-    void import("lenis").then(({ default: Lenis }) => {
-      if (cancelled) return
-      const lenis = new Lenis({ duration: 1.1, autoRaf: true })
-      setLenis(lenis)
-      destroy = () => {
-        lenis.destroy()
-        setLenis(null)
-      }
-    })
+    let idleId = 0
+    // Start Lenis once the page is idle after load, so it never competes with first render
+    const start = () => {
+      const run = () =>
+        void import("lenis").then(({ default: Lenis }) => {
+          if (cancelled) return
+          const lenis = new Lenis({ duration: 1.1, autoRaf: true })
+          setLenis(lenis)
+          destroy = () => {
+            lenis.destroy()
+            setLenis(null)
+          }
+        })
+      idleId =
+        typeof window.requestIdleCallback === "function"
+          ? window.requestIdleCallback(run, { timeout: 2500 })
+          : window.setTimeout(run, 1200)
+    }
+    if (document.readyState === "complete") start()
+    else window.addEventListener("load", start, { once: true })
     return () => {
       cancelled = true
+      window.removeEventListener("load", start)
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idleId)
+      window.clearTimeout(idleId)
       destroy?.()
     }
   }, [reduced])

@@ -4,7 +4,6 @@ import { socialIcons } from "@/components/icons/BrandIcons"
 import { Button } from "@/components/ui/button"
 import { profile, socials, visibility } from "@/lib/content"
 import { asset } from "@/lib/site"
-import { HeroIntro } from "./HeroIntro"
 
 export function Hero() {
   const img = profile.image
@@ -19,7 +18,7 @@ export function Hero() {
 
       <div className="container-page grid items-center gap-12 pt-12 pb-20 sm:pt-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pt-24 lg:pb-28">
         <div className="order-2 lg:order-1">
-          <p data-hero className="mb-5 inline-flex items-center gap-2 rounded-full border bg-surface/70 px-3 py-1 font-mono text-xs text-muted-foreground">
+          <p data-hero style={{ "--i": 0 } as React.CSSProperties} className="mb-5 inline-flex items-center gap-2 rounded-full border bg-surface/70 px-3 py-1 font-mono text-xs text-muted-foreground">
             <MapPin className="size-3.5 text-primary" aria-hidden="true" />
             {profile.location}
           </p>
@@ -29,17 +28,17 @@ export function Hero() {
           </h1>
 
           <p
-            data-hero
+            data-hero style={{ "--i": 1 } as React.CSSProperties}
             className="text-gradient role-shimmer mt-4 font-display text-[clamp(1.5rem,3vw,2rem)] font-semibold"
           >
             {profile.roles.join(" · ")}
           </p>
 
-          <p data-hero className="prose-width mt-6 text-lg text-muted-foreground">
+          <p data-hero style={{ "--i": 2 } as React.CSSProperties} className="prose-width mt-6 text-lg text-muted-foreground">
             {profile.valueStatement}
           </p>
 
-          <div data-hero className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div data-hero style={{ "--i": 3 } as React.CSSProperties} className="mt-8 flex flex-col gap-3 sm:flex-row">
             {visibility.work ? (
               <>
                 <Button asChild size="lg" className="h-12 rounded-full px-6 text-base">
@@ -69,7 +68,7 @@ export function Hero() {
             )}
           </div>
 
-          <div data-hero className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+          <div data-hero style={{ "--i": 4 } as React.CSSProperties} className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
             <a
               href={asset(profile.cv)}
               download
@@ -115,9 +114,9 @@ export function Hero() {
 
         {/* Portrait with rotating conic ring */}
         <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
-          <div className="animate-float relative size-52 sm:size-64 lg:size-80">
+          <div className="animate-float relative size-52 will-change-transform sm:size-64 lg:size-80">
             <div data-hero-ring aria-hidden="true" className="absolute -inset-1.5">
-              <div className="ring-conic animate-spin-slow size-full rounded-full opacity-90 blur-[1px]" />
+              <div className="ring-conic animate-spin-slow size-full rounded-full opacity-90 blur-[1px] will-change-transform" />
             </div>
             <div aria-hidden="true" className="absolute -inset-1.5 rounded-full ring-conic opacity-40 blur-2xl" />
             <div className="relative size-full overflow-hidden rounded-full border-4 border-background bg-surface">
@@ -138,7 +137,6 @@ export function Hero() {
           </div>
         </div>
       </div>
-      <HeroIntro />
     </section>
   )
 }
