@@ -19,4 +19,9 @@ for (const [name, t] of Object.entries(themes)) {
   const r = ratio(t["on-accent"], t.accent);
   rows.push({ theme: name, pair: `button text ${t["on-accent"]} on --accent`, ratio: r.toFixed(2), body: r >= 4.5 ? "pass" : "FAIL", large: r >= 3 ? "pass" : "FAIL" });
 }
+// Terminal window (same in both themes)
+for (const [name, fg] of Object.entries({ "terminal text": "#F0EEE9", "terminal output": "#C9D1DB", "terminal error": "#FDA4AF", "terminal muted": "#9AA4B2", "terminal prompt": "#2DD4BF" })) {
+  const r = ratio(fg, "#0B0F14")
+  rows.push({ theme: "both", pair: `${name} ${fg} on #0B0F14`, ratio: r.toFixed(2), body: r >= 4.5 ? "pass" : "FAIL", large: r >= 3 ? "pass" : "FAIL" })
+}
 console.table(rows);

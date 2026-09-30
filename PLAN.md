@@ -1,6 +1,6 @@
 # Portfolio build plan: Nalini Raseekaran
 
-Status: **waiting for "go"** before any code is written.
+Status: **built**. See REPORT.md for the checklist results and remaining TODOs.
 
 ## 1. Stack (latest stable as of 2026-09-30)
 

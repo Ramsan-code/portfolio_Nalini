@@ -5,6 +5,7 @@
 //   QA_URL=http://localhost:4000/ QA_CHROMIUM=/path/to/chrome npm run qa
 //
 // Exits non-zero if any check fails.
+import AxeBuilder from "@axe-core/playwright"
 import { chromium } from "@playwright/test"
 
 const BASE = process.env.QA_URL || "http://localhost:4000/"
@@ -45,6 +46,17 @@ for (const scheme of ["dark", "light"]) {
   await page.goto(BASE, { waitUntil: "networkidle" })
   await scrollThrough(page)
   check(`no console errors or hydration warnings (${scheme})`, errors.length === 0, errors.slice(0, 3).join(" | "))
+  await context.close()
+}
+
+// 1b. axe-core (WCAG 2.2 AA incl. colour contrast), both themes -------------
+for (const scheme of ["dark", "light"]) {
+  const { context, page } = await newPage({ colorScheme: scheme, reducedMotion: "reduce" })
+  await page.goto(BASE, { waitUntil: "networkidle" })
+  await scrollThrough(page)
+  const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()
+  const summary = violations.map((v) => `${v.id}×${v.nodes.length}: ${v.nodes[0]?.target.join(" ")} ${v.nodes[0]?.any[0]?.message ?? ""}`.slice(0, 220))
+  check(`axe WCAG AA, no violations (${scheme})`, violations.length === 0, summary.join(" | "))
   await context.close()
 }
 
