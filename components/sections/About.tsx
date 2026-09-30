@@ -71,6 +71,7 @@ export function About() {
             title="About me"
             icon={<Sparkles className="size-3.5 text-primary" aria-hidden="true" />}
             className="sm:col-span-2 lg:row-span-2"
+            variant="strong"
           >
             <p className="font-display text-2xl leading-snug font-semibold text-balance sm:text-[1.75rem]">
               Hi, I&apos;m {profile.shortName}. I bridge <span className="text-primary">design</span> and{" "}

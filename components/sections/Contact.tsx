@@ -83,7 +83,7 @@ export function Contact() {
             )}
           </div>
 
-          <div data-reveal className="relative min-w-0 rounded-2xl border bg-surface p-5 sm:p-8">
+          <div data-reveal data-spotlight className="glass-strong glass-edge min-w-0 rounded-2xl p-5 sm:p-8">
             <h3 className="mb-6 font-display text-xl font-semibold">Send a message</h3>
             <ContactFormLazy email={profile.email} />
           </div>

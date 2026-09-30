@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 /** macOS-style window chrome. Shared by the placeholder and the live terminal (no layout shift). */
 export function TerminalFrame({ children }: { children?: ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-2xl border bg-[#0B0F14] text-[#F0EEE9] shadow-2xl shadow-black/20">
+    <div className="glass-terminal overflow-hidden rounded-2xl text-[#F0EEE9]">
       <div className="flex items-center gap-2 border-b border-white/10 bg-white/[0.04] px-4 py-3">
         <span aria-hidden="true" className="size-3 rounded-full bg-[#FF5F57]" />
         <span aria-hidden="true" className="size-3 rounded-full bg-[#FEBC2E]" />

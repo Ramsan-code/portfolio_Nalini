@@ -24,4 +24,4 @@ for (const [name, fg] of Object.entries({ "terminal text": "#F0EEE9", "terminal 
   const r = ratio(fg, "#0B0F14")
   rows.push({ theme: "both", pair: `${name} ${fg} on #0B0F14`, ratio: r.toFixed(2), body: r >= 4.5 ? "pass" : "FAIL", large: r >= 3 ? "pass" : "FAIL" })
 }
-console.table(rows);
+if (process.argv[1]?.endsWith("contrast.mjs") && !process.argv[1].endsWith("glass-contrast.mjs")) console.table(rows);

@@ -1,5 +1,6 @@
 import { ArrowUpRight, Code, LayoutTemplate, Palette, PenTool, Search, Smartphone } from "lucide-react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { GlassCard } from "@/components/ui/glass-card"
 import { services } from "@/lib/content"
 import type { Service } from "@/data/types"
 import { SectionHeading } from "./SectionHeading"
@@ -29,7 +30,7 @@ export function Services() {
             const Icon = icons[service.icon]
             return (
               <li key={service.title} data-reveal>
-                <Card className="group h-full gap-4 rounded-2xl transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5">
+                <GlassCard spotlight className="group flex h-full flex-col gap-4 py-6 text-card-foreground transition-[translate,border-color] duration-200 hover:-translate-y-1 hover:border-primary/50">
                   <CardHeader>
                     <span className="mb-3 grid size-12 place-items-center rounded-xl bg-accent text-primary transition-colors duration-200 group-hover:bg-primary group-hover:text-primary-foreground">
                       <Icon className="size-6" aria-hidden="true" />
@@ -50,7 +51,7 @@ export function Services() {
                       <ArrowUpRight className="size-4" aria-hidden="true" />
                     </a>
                   </CardFooter>
-                </Card>
+                </GlassCard>
               </li>
             )
           })}

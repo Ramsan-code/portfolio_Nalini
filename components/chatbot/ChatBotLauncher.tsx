@@ -42,7 +42,7 @@ export function ChatBotLauncher() {
           setMounted(true)
           dispatch(setOpen(!open))
         }}
-        className="bg-gradient-brand fixed right-4 bottom-4 z-40 grid size-14 place-items-center rounded-full text-white shadow-xl dark:text-[#0B0F14] shadow-black/25 transition-transform duration-200 hover:scale-105 focus-visible:outline-offset-4 sm:right-5 sm:bottom-5"
+        className="glass-strong glass-edge fixed right-4 bottom-4 z-40 grid size-14 place-items-center rounded-full text-primary transition-transform duration-200 hover:scale-105 focus-visible:outline-offset-4 sm:right-5 sm:bottom-5"
       >
         <MessageCircleQuestion className="size-6" aria-hidden="true" />
         {hasMessages && !open && (

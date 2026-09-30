@@ -5,7 +5,7 @@ import { NavClient } from "./NavClient"
 
 export function Navbar() {
   return (
-    <header className="glass sticky top-0 z-40 border-b border-border/70">
+    <header className="glass-nav sticky top-0 z-40">
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <a href="#home" className="flex items-center gap-2.5 rounded-lg" aria-label={`${profile.name}, back to top`}>
           <Logo />

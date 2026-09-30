@@ -17,7 +17,17 @@
   --accent-2: #1d4ed8;
   --on-accent: #ffffff;
   --gradient: linear-gradient(135deg, #0f766e 0%, #800000 55%, #7e22ce 100%);
-  --glass: rgb(255 255 255 / 0.72);
+  /* Glass (see @layer components). Opacities are tuned with
+     scripts/glass-contrast.mjs so text stays AA over the ambient blobs. */
+  --glass-bg: rgb(255 255 255 / 0.55);
+  --glass-strong-bg: rgb(255 255 255 / 0.82);
+  --glass-nav-bg: rgb(255 255 255 / 0.86);
+  --glass-border: rgb(15 23 42 / 0.08);
+  --glass-highlight: rgb(255 255 255 / 0.7);
+  --glass-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.18);
+  /* Pointer spotlight: a white sheen in light mode (raises contrast under dark text) */
+  --spotlight: rgb(255 255 255 / 0.5);
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 .06 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
   /* shadcn aliases */
   --radius: 0.75rem;
@@ -49,7 +59,13 @@
   --accent-2: #f472b6;
   --on-accent: #0b0f14;
   --gradient: linear-gradient(135deg, #2dd4bf 0%, #b0304a 55%, #a855f7 100%);
-  --glass: rgb(18 24 33 / 0.7);
+  --glass-bg: rgb(18 24 33 / 0.55);
+  --glass-strong-bg: rgb(18 24 33 / 0.8);
+  --glass-nav-bg: rgb(18 24 33 / 0.84);
+  --glass-border: rgb(255 255 255 / 0.08);
+  --glass-highlight: rgb(255 255 255 / 0.08);
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 12px 32px -12px rgb(0 0 0 / 0.55);
+  --spotlight: rgb(45 212 191 / 0.05);
   --destructive: #f87171;
 }
 
@@ -150,10 +166,97 @@
   .bg-gradient-brand {
     background-image: var(--gradient);
   }
+  /* ---------------- Glass material ----------------
+     Backgrounds are !important so shadcn/Tailwind `bg-*` defaults on the
+     same element (Card, DialogContent, SheetContent) can't turn it opaque. */
+  .glass,
+  .glass-strong,
+  .glass-nav {
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow);
+    background-image: var(--noise) !important;
+  }
   .glass {
-    background: var(--glass);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
-    backdrop-filter: blur(12px) saturate(140%);
+    background-color: var(--glass-bg) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+  }
+  /* Nav, dialogs, chatbot panel, forms: more opacity + blur for guaranteed AA */
+  .glass-strong {
+    background-color: var(--glass-strong-bg) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    backdrop-filter: blur(24px) saturate(170%);
+  }
+  .glass-nav {
+    background-color: var(--glass-nav-bg) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    backdrop-filter: blur(24px) saturate(170%);
+    border-width: 0 0 1px;
+  }
+  /* The terminal stays dark in both themes */
+  .glass-terminal {
+    background-color: rgb(11 15 20 / 0.9) !important;
+    background-image: var(--noise) !important;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 24px 48px -16px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+  }
+  /* 1px gradient border (mask-composite). Featured elements only. */
+  .glass-edge {
+    position: relative;
+    isolation: isolate;
+    border-color: transparent;
+  }
+  .glass-edge::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--gradient);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+  /* Cursor spotlight (position set by SpotlightTracker). Sits under the
+     content (z-index -1 inside the card's own stacking context). */
+  [data-spotlight] {
+    position: relative;
+    isolation: isolate;
+  }
+  [data-spotlight]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      var(--spotlight),
+      transparent 65%
+    );
+    opacity: 0;
+    transition: opacity 200ms ease;
+    pointer-events: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-spotlight]:hover::after {
+      opacity: 1;
+    }
+  }
+  /* No backdrop-filter support: fall back to the solid surface */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass,
+    .glass-strong,
+    .glass-nav {
+      background-color: var(--surface) !important;
+    }
+    .glass-terminal {
+      background-color: #0b0f14 !important;
+    }
   }
   .eyebrow {
     @apply font-mono text-xs uppercase tracking-[0.2em] text-primary;

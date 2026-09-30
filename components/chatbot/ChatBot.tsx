@@ -83,7 +83,7 @@ export default function ChatBot({ launcherRef }: { launcherRef: RefObject<HTMLBu
               launcherRef.current?.focus()
             }
           }}
-          className="fixed inset-x-2 bottom-2 z-50 flex h-[min(85dvh,640px)] flex-col overflow-hidden rounded-2xl border bg-surface shadow-2xl outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 sm:inset-x-auto sm:right-5 sm:bottom-24 sm:h-[min(72dvh,560px)] sm:w-[380px]"
+          className="fixed inset-x-2 bottom-2 z-50 flex h-[min(85dvh,640px)] flex-col overflow-hidden glass-strong rounded-2xl outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 sm:inset-x-auto sm:right-5 sm:bottom-24 sm:h-[min(72dvh,560px)] sm:w-[380px]"
         >
           <div aria-hidden="true" className="bg-gradient-brand h-1 shrink-0" />
           <header className="flex items-center gap-3 border-b px-4 py-3">

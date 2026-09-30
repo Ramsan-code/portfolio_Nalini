@@ -38,7 +38,7 @@ export default function ProjectDialog({ project, open, onClose, onCloseAutoFocus
         <DialogContent
           data-lenis-prevent
           onCloseAutoFocus={onCloseAutoFocus}
-          className="max-h-[90dvh] overflow-y-auto p-0 sm:max-w-3xl"
+          className="glass-strong max-h-[90dvh] overflow-y-auto rounded-2xl p-0 sm:max-w-3xl"
         >
           {/* Gallery: horizontal scroll-snap strip */}
           <div

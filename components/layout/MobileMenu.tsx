@@ -30,7 +30,7 @@ export default function MobileMenu({ links, active, open, onOpenChange, restoreF
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="w-[82vw] max-w-xs border-l bg-surface"
+        className="glass-strong w-[82vw] max-w-xs rounded-none border-y-0 border-r-0"
         data-lenis-prevent
         onCloseAutoFocus={(event) => {
           event.preventDefault()
