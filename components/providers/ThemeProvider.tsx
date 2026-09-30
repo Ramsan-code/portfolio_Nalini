@@ -2,8 +2,7 @@
 
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
 import { useEffect, type ReactNode } from "react"
-
-export const THEME_COLORS = { light: "#F0EEE9", dark: "#0B0F14" } as const
+import { THEME_COLORS } from "@/lib/site"
 
 /** Keeps <meta name="theme-color"> in sync when the user overrides the OS theme. */
 function ThemeColorSync() {

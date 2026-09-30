@@ -4,7 +4,6 @@ import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
 import { projectCategories } from "@/data/projects"
 import type { Project } from "@/data/types"
-import { gsap } from "@/lib/gsap"
 import { useReducedMotion } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
@@ -35,14 +34,22 @@ export function ProjectGrid({ projects }: { projects: Project[] }) {
       firstRender.current = false
       return
     }
-    if (reduced || !gridRef.current) return
-    const tween = gsap.fromTo(
-      gridRef.current.children,
-      { opacity: 0, y: 16, scale: 0.97 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power2.out", stagger: 0.06, clearProps: "transform,opacity" }
-    )
+    const grid = gridRef.current
+    if (reduced || !grid) return
+    let cancelled = false
+    let kill: (() => void) | undefined
+    void import("@/lib/gsap").then(({ gsap }) => {
+      if (cancelled) return
+      const tween = gsap.fromTo(
+        grid.children,
+        { opacity: 0, y: 16, scale: 0.97 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power2.out", stagger: 0.06, clearProps: "transform,opacity" }
+      )
+      kill = () => tween.kill()
+    })
     return () => {
-      tween.kill()
+      cancelled = true
+      kill?.()
     }
   }, [active, reduced])
 
@@ -53,16 +60,19 @@ export function ProjectGrid({ projects }: { projects: Project[] }) {
       return
     }
     // Animate the current cards out, then swap
+    const cards = gridRef.current.children
     setAnimating(true)
-    gsap.to(gridRef.current.children, {
-      opacity: 0,
-      y: -8,
-      duration: 0.18,
-      ease: "power1.in",
-      onComplete: () => {
-        dispatch(setFilter(id))
-        setAnimating(false)
-      },
+    void import("@/lib/gsap").then(({ gsap }) => {
+      gsap.to(cards, {
+        opacity: 0,
+        y: -8,
+        duration: 0.18,
+        ease: "power1.in",
+        onComplete: () => {
+          dispatch(setFilter(id))
+          setAnimating(false)
+        },
+      })
     })
   }
 

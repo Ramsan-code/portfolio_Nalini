@@ -1,7 +1,7 @@
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react"
 import { socialIcons } from "@/components/icons/BrandIcons"
 import { profile, socials } from "@/lib/content"
-import { ContactForm } from "./ContactForm"
+import { ContactFormLazy } from "./ContactFormLazy"
 import { SectionHeading } from "./SectionHeading"
 
 const cards = [
@@ -85,7 +85,7 @@ export function Contact() {
 
           <div data-reveal className="relative rounded-2xl border bg-surface p-5 sm:p-8">
             <h3 className="mb-6 font-display text-xl font-semibold">Send a message</h3>
-            <ContactForm email={profile.email} />
+            <ContactFormLazy email={profile.email} />
           </div>
         </div>
       </div>

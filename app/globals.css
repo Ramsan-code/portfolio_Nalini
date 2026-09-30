@@ -168,10 +168,21 @@
   }
 }
 
-/* Reveal: content is visible by default. Only once JS confirms motion is
-   allowed does <html> get .motion-ok, and then GSAP animates it in. */
+/* Reveal: content is visible by default. Only when motion is allowed does
+   <html> get .motion-ok (inline head script); RevealOnScroll then adds
+   .is-revealed as each element enters the viewport. */
 .motion-ok [data-reveal] {
   opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.motion-ok [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -181,8 +192,11 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .motion-ok [data-reveal] {
+  .motion-ok [data-reveal],
+  .motion-ok [data-hero],
+  .motion-ok [data-hero-ring] {
     opacity: 1;
+    transform: none;
   }
 }
 

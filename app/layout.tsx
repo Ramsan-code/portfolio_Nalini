@@ -4,12 +4,12 @@ import { Footer } from "@/components/layout/Footer"
 import { Navbar } from "@/components/layout/Navbar"
 import { SmoothScroll } from "@/components/layout/SmoothScroll"
 import { RevealOnScroll } from "@/components/motion/RevealOnScroll"
+import { LazyToaster } from "@/components/providers/LazyToaster"
 import { ReduxProvider } from "@/components/providers/ReduxProvider"
-import { THEME_COLORS, ThemeProvider } from "@/components/providers/ThemeProvider"
+import { ThemeProvider } from "@/components/providers/ThemeProvider"
 import { ChatBotLauncher } from "@/components/chatbot/ChatBotLauncher"
-import { Toaster } from "@/components/ui/sonner"
 import { buildJsonLd } from "@/lib/jsonld"
-import { absoluteUrl, siteDescription, siteTitle, siteUrl, basePath } from "@/lib/site"
+import { absoluteUrl, basePath, siteDescription, siteTitle, siteUrl, THEME_COLORS } from "@/lib/site"
 import { profile } from "@/data/profile"
 import "./globals.css"
 
@@ -102,7 +102,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </main>
             <Footer />
             <ChatBotLauncher />
-            <Toaster position="bottom-center" richColors closeButton />
+            <LazyToaster />
             <SmoothScroll />
             <RevealOnScroll />
           </ReduxProvider>

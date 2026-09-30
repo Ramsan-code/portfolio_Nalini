@@ -22,3 +22,6 @@ export function absoluteUrl(path = "/"): string {
 export const siteTitle = "Nalini Raseekaran — Software Developer & UI/UX Designer"
 export const siteDescription =
   "Portfolio of Nalini Raseekaran, a BIT undergraduate and UI/UX designer in Vavuniya, Sri Lanka, designing intuitive, user-centred digital products with Figma and code."
+
+/** Browser UI colour per theme (matches --bg). */
+export const THEME_COLORS = { light: "#F0EEE9", dark: "#0B0F14" } as const

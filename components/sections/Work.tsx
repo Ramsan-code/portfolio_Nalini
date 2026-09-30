@@ -1,8 +1,12 @@
+import dynamic from "next/dynamic"
 import { designWork, projects, testimonials, visibility } from "@/lib/content"
-import { DesignGallery } from "./DesignGallery"
-import { ProjectGrid } from "./ProjectGrid"
 import { SectionHeading } from "./SectionHeading"
-import { Testimonials } from "./Testimonials"
+
+// Still server-rendered, but each lives in its own chunk that only loads
+// when the section has data to show.
+const ProjectGrid = dynamic(() => import("./ProjectGrid").then((m) => m.ProjectGrid))
+const DesignGallery = dynamic(() => import("./DesignGallery").then((m) => m.DesignGallery))
+const Testimonials = dynamic(() => import("./Testimonials").then((m) => m.Testimonials))
 
 export function Work() {
   if (!visibility.work && !visibility.testimonials) return null
