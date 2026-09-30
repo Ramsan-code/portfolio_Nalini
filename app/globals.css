@@ -191,3 +191,27 @@ html.lenis, html.lenis body { height: auto; }
 .lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
 .lenis [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* Hero intro targets (animated once by HeroIntro). Never the h1 or the
+   portrait, so the LCP element paints immediately. */
+.motion-ok [data-hero],
+.motion-ok [data-hero-ring] {
+  opacity: 0;
+}
+
+.role-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 6s ease-in-out infinite alternate;
+}
+@keyframes shimmer {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--text) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--text) 6%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, #000 40%, transparent 100%);
+}

@@ -26,8 +26,9 @@ export function RevealOnScroll() {
     }
     const ctx = gsap.context(() => {
       const els = gsap.utils.toArray<HTMLElement>("[data-reveal]")
-      gsap.set(els, { opacity: 0, y: 24 })
       window.__nrReveal = true
+      if (els.length === 0) return
+      gsap.set(els, { opacity: 0, y: 24 })
       ScrollTrigger.batch(els, {
         start: "top 88%",
         once: true,
