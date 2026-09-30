@@ -49,6 +49,7 @@ All personal content lives in typed files in `/data`. You never need to touch a 
 - **`draft: true`.** Items marked as drafts (the example services, projects and design pieces) only appear in dev. When an item is real, fill it in and **delete `draft: true`**.
 - **Hidden sections.** Sections and nav links with no real items are dropped automatically: Services, Work, Design gallery, Testimonials, Medium and Certifications.
 - To preview drafts in a production build, run `NEXT_PUBLIC_SHOW_DRAFTS=true npm run build`.
+- **Currently on:** `.env.production` (committed) sets `NEXT_PUBLIC_SHOW_DRAFTS=true`, so the live site shows every section, including the example content and placeholder images. Once your real content is in `/data`, change it to `false` (or delete the line) and redeploy to hide anything still unfinished. A value set in your hosting dashboard overrides this file.
 
 ### Images
 

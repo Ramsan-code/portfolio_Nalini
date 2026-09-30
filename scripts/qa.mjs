@@ -7,8 +7,13 @@
 // Exits non-zero if any check fails.
 import AxeBuilder from "@axe-core/playwright"
 import { chromium } from "@playwright/test"
+import { existsSync, readFileSync } from "node:fs"
 
 const BASE = process.env.QA_URL || "http://localhost:4000/"
+// Drafts are shown when QA_DRAFTS is set or .env.production turns them on
+const DRAFTS =
+  !!process.env.QA_DRAFTS ||
+  (existsSync(".env.production") && /^NEXT_PUBLIC_SHOW_DRAFTS=true/m.test(readFileSync(".env.production", "utf8")))
 const executablePath = process.env.QA_CHROMIUM || (process.env.PLAYWRIGHT_BROWSERS_PATH ? "/opt/pw-browsers/chromium" : undefined)
 const browser = await chromium.launch(executablePath ? { executablePath } : {})
 
@@ -108,7 +113,7 @@ for (const width of [360, 768, 1024, 1440]) {
   check("every <img> has alt", info.noAlt === 0, `${info.noAlt} missing`)
   check('html lang="en"', info.lang === "en")
   check("icon-only links/buttons have accessible names", info.iconLinksWithoutName === 0, `${info.iconLinksWithoutName} unnamed`)
-  if (!process.env.QA_DRAFTS) {
+  if (!DRAFTS) {
     const todo = await page.evaluate(() => document.body.innerText.includes("TODO"))
     check("no TODO placeholders visible (production build)", !todo)
   }
