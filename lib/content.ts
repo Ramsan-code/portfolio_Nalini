@@ -14,22 +14,9 @@ import {
 import { testimonials } from "@/data/testimonials"
 import { timeline as allTimeline } from "@/data/timeline"
 import type { TimelineItem } from "@/data/types"
+import { isFilled, showDrafts } from "./filled"
 
-/**
- * Draft items and TODO placeholders are visible in `next dev` so you can see
- * where content goes, and hidden in production builds.
- * Set NEXT_PUBLIC_SHOW_DRAFTS=true to preview them in a production build.
- */
-export const showDrafts =
-  process.env.NODE_ENV !== "production" ||
-  process.env.NEXT_PUBLIC_SHOW_DRAFTS === "true"
-
-/** True when a value is present and not a "TODO" placeholder. */
-export function isFilled(value: string | undefined | null): value is string {
-  if (!value) return false
-  const v = value.trim()
-  return v.length > 0 && !/^todo\b/i.test(v)
-}
+export { isFilled, showDrafts }
 
 /** Keep a value if it is filled, or if drafts are being previewed. */
 function keep(value: string | undefined): string | undefined {
