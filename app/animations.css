@@ -310,3 +310,10 @@ html[data-effects="reduced"] .marquee-item[aria-hidden] { display: none; }
 @keyframes focus-ring-in {
   from { outline-offset: 6px; outline-color: transparent; }
 }
+
+/* ---------------- Reduce effects: stop remaining decorative loops ---------------- */
+html[data-effects="reduced"] .animate-spin-slow,
+html[data-effects="reduced"] .animate-float,
+html[data-effects="reduced"] .role-shimmer {
+  animation: none !important;
+}

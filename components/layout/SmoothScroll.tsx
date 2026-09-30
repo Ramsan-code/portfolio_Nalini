@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect } from "react"
-import { useReducedMotion } from "@/lib/motion"
-import { scrollToTarget, setLenis } from "@/lib/scroll"
+import { useRichMotion } from "@/lib/effects"
+import { getLenis, scrollToTarget, setLenis } from "@/lib/scroll"
 
 /**
  * Lenis smooth scrolling (skipped entirely under prefers-reduced-motion,
@@ -10,10 +10,10 @@ import { scrollToTarget, setLenis } from "@/lib/scroll"
  * in-page anchor handling that offsets for the sticky nav and moves focus.
  */
 export function SmoothScroll() {
-  const reduced = useReducedMotion()
+  const rich = useRichMotion()
 
   useEffect(() => {
-    if (reduced) return
+    if (!rich) return
     let cancelled = false
     let destroy: (() => void) | undefined
     let idleId = 0
@@ -27,6 +27,13 @@ export function SmoothScroll() {
           destroy = () => {
             lenis.destroy()
             setLenis(null)
+            // Lenis 1.3 doesn't clear its 400ms velocity-reset timer on destroy; if
+            // destroyed mid-scroll, that timer re-adds the "lenis" classes. Sweep them.
+            window.setTimeout(() => {
+              if (getLenis()) return
+              const root = document.documentElement
+              for (const c of Array.from(root.classList)) if (c === "lenis" || c.startsWith("lenis-")) root.classList.remove(c)
+            }, 450)
           }
         })
       idleId =
@@ -43,7 +50,7 @@ export function SmoothScroll() {
       window.clearTimeout(idleId)
       destroy?.()
     }
-  }, [reduced])
+  }, [rich])
 
   useEffect(() => {
     function onClick(event: MouseEvent) {

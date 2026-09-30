@@ -1,7 +1,7 @@
 # Nalini Raseekaran: Portfolio
 
 Personal portfolio for **Nalini Raseekaran, Software Developer & UI/UX Designer**.
-It's a single-page static site built with Next.js 16 (App Router, `output: "export"`), TypeScript, Tailwind CSS 4, shadcn/ui, lucide-react, Redux Toolkit, GSAP + Lenis, and react-hook-form + zod.
+It's a single-page static site built with Next.js 16 (App Router, `output: "export"`), TypeScript, Tailwind CSS 4, shadcn/ui, lucide-react, Redux Toolkit, GSAP + Lenis, three.js, and react-hook-form + zod, with a "liquid glass over a living gradient" visual layer (see [Visual effects](#visual-effects-glass-ambient-light-3d-motion)).
 
 ```bash
 npm install
@@ -19,6 +19,9 @@ npm start            # serve ./out on http://localhost:4000
 | `npm run images` | Converts JPG/PNG in `public/images` to WebP + AVIF and creates any missing placeholders and `og-image.png`. |
 | `npm run qa` | Playwright + axe end-to-end checks against the served export (see [Quality checks](#quality-checks)). |
 | `npm run contrast` | Prints WCAG contrast ratios for the design tokens. |
+| `npm run glass-contrast` | Worst-case contrast of every text colour on every glass variant, over the ambient blobs. |
+| `npm run sculpture` | Re-renders the static 3D fallback images from the live scene (needs `npm run dev` running). |
+| `npm run perf:scroll` | Scroll frame-time test under 4× CPU throttling (see [Performance tuning](#performance-tuning)). |
 
 ---
 
@@ -134,24 +137,81 @@ mkdir -p /tmp/site && cp -r out /tmp/site/portfolio_Nalini && npx serve /tmp/sit
 
 ---
 
+## Visual effects: glass, ambient light, 3D, motion
+
+"Liquid glass over a living gradient": frosted glass panels over slowly moving teal / maroon / purple light, one glass sculpture in the hero, and a few orchestrated motion moments. Everything decorative is `aria-hidden`, ignores the pointer and focus, respects `prefers-reduced-motion`, and can be switched off by visitors.
+
+| Layer | Where | Notes |
+|---|---|---|
+| Glass | `app/globals.css` (`.glass`, `.glass-strong`, `.glass-nav`, `.glass-terminal`, `.glass-edge`), `components/ui/glass-card.tsx` | Solid-surface fallback when `backdrop-filter` is unsupported |
+| Ambient background | `components/animations/AmbientBackground.tsx`, `app/animations.css` | CSS transform loops; ≤ 60px scroll parallax; paused in hidden tabs |
+| 3D sculpture | `lib/three/hero-sculpture.ts` (scene), `components/three/HeroScene.tsx` (lazy), `components/three/HeroStage.tsx` (gate + fallback) | Plain three.js, 131 KB gzip, loaded after the hero intro when idle |
+| Motion runtime | `components/animations/EffectsRuntime.tsx` (lazy): SplitText headings, magnetic buttons, spotlight, timeline scrub, parallax | All via `useGSAP` + `gsap.matchMedia`; loads on first interaction |
+| CSS-only motion | `app/animations.css`: preloader, hero intro, marquee, card tilt/glare, gallery depth, focus rings | Transform / opacity / filter only |
+| Filter animation | `hooks/useFlipFilter.ts` | GSAP Flip for the project filter |
+
+### Changing the 3D colours or shape
+
+All in `lib/three/hero-sculpture.ts`:
+
+- **Colours:** `PALETTES.dark` / `PALETTES.light`. `tint` colours the glass; `lights` are the four brand-coloured panels reflected in it (they're baked into reflections at runtime, with no HDR downloads). The scene switches palette live when the theme changes.
+- **Shape:** `SHAPE` holds the torus knot `radius`, `tube` thickness and `p` / `q`. Try `p: 3, q: 4` or `p: 2, q: 5` for different knots. To use a different object, swap `TorusKnotGeometry` in the constructor, e.g. for `IcosahedronGeometry(1.2, 20)`, a smooth blob.
+- **Material:** `GLASS` (iridescence, clearcoat, roughness, reflection strength). Glass transparency comes from the Fresnel alpha in `withGlassAlpha`: rims are opaque, the centre is clear.
+- **Afterwards:** regenerate the static fallback so weak devices see the same thing: `npm run dev`, then `npm run sculpture` in another terminal. It writes `public/images/hero-sculpture-{dark,light}.{avif,webp}`.
+
+### Turning effects off
+
+- **Visitors:** the **Reduce effects** switch in the footer turns off the 3D sculpture (static image instead), ambient blobs, the preloader, Lenis smooth scrolling, scroll reveals, split-text headings, magnetic/tilt/spotlight effects and the marquee. It's remembered in `localStorage`. The OS "reduce motion" setting does the same automatically.
+- **For the whole site:**
+  - 3D: remove `<HeroStage />` from `components/sections/Hero.tsx`
+  - blobs: remove `<AmbientBackground />` from `app/layout.tsx`
+  - preloader: remove `<Preloader />` from `app/layout.tsx`
+  - motion runtime: remove `<EffectsLoader />` from `app/layout.tsx`
+- **Testing overrides:** `?effects=full` forces the live WebGL sculpture (on any WebGL-capable device). `?effects=static` forces the image.
+
+### Performance tuning
+
+| Knob | Where | Default |
+|---|---|---|
+| Which devices get live 3D | `MIN_CPU_CORES_FOR_3D`, `MIN_MEMORY_GB_FOR_3D` in `lib/capabilities.ts` | ≥ 5 cores and ≥ 5 GB (so ≤ 4 cores / ≤ 4 GB get the image) |
+| 3D pixel ratio and geometry detail | `QUALITY` in `lib/three/hero-sculpture.ts` | dpr ≤ 1.5; 240×28 segments desktop, 120×12 on small screens |
+| When the 3D loads | `HeroStage.tsx` | after the hero intro (+ preloader), then `requestIdleCallback` |
+| When the motion runtime loads | `EffectsLoader.tsx` | first scroll / pointer / key, or 4s after load |
+| Glass blur | `.glass` (16px) / `.glass-strong` (24px) in `app/globals.css` | Lower radii are cheaper on low-end GPUs |
+| Blob strength | `--blob-alpha` in `app/animations.css` | 0.20 dark / 0.06 light. **Run `npm run glass-contrast` after raising it**: it's capped so text on glass stays AA. |
+| Preloader length | `.preloader` timings in `app/animations.css` | ≤ 1.2s, first view per session only |
+
+The 3D only renders while the hero is on screen and the tab is visible, compiles shaders asynchronously (`compileAsync`), and is drawn into a `<canvas>`. The static fallback is drawn into a 2D canvas too, so neither can become the LCP element; the portrait stays LCP.
+
+To check scroll smoothness, run `npm run build && npm start`, then `npm run perf:scroll` (4× CPU throttle, phone-sized viewport, median of 3 runs). Add `-- "http://localhost:4000/?effects=full"` to include the live 3D. In containers without a GPU, WebGL and compositing run in software, so compare builds rather than reading the numbers as a device benchmark.
+
+---
+
 ## Project structure
 
 ```
-app/            layout (fonts, providers, metadata, JSON-LD), page, globals.css (tokens), sitemap, robots, 404, icon
+app/            layout (fonts, providers, metadata, JSON-LD, pre-paint script), page, globals.css (tokens + glass),
+                animations.css (all motion), sitemap, robots, 404, icon
 components/
   layout/       Navbar, NavClient (active section), MobileMenu (Sheet), ThemeToggle, SmoothScroll (Lenis), Footer, Logo
   sections/     Hero, About (bento), Services, Journey (+ MediumFeed), Work (+ ProjectGrid, dialogs, gallery,
                 testimonials), Process, TerminalSection (+ Terminal), Contact (+ ContactForm)
   chatbot/      ChatBotLauncher, ChatBot, ChatMessage, QuickReplies
-  motion/       RevealOnScroll (IntersectionObserver reveals)
+  animations/   AmbientBackground, Preloader, EffectsLoader → EffectsRuntime (SplitHeadings, Magnetic,
+                SpotlightTracker, TimelineScrub, AmbientParallax), RevealOnScroll, Marquee, CountUp, ScrollProgress
+  three/        HeroStage (capability gate + static fallback), HeroScene (lazy WebGL)
   providers/    ThemeProvider (next-themes), ReduxProvider, LazyToaster
   icons/        Brand icons (lucide-react 1.x no longer ships them)
   ui/           shadcn/ui components (button, badge, card, sheet, dialog, form, input, textarea, label, carousel, skeleton, sonner)
+                + glass-card.tsx
+hooks/          useFlipFilter (GSAP Flip), usePointerTilt (card tilt, gallery depth)
 data/           all personal content (see above)
-lib/            content filtering (drafts/TODOs), site config, gsap setup, scroll helpers, medium fetch,
+lib/            content filtering (drafts/TODOs), site config, gsap setup (single registration point),
+                effects preference, 3D capability check, three/hero-sculpture, scroll helpers, medium fetch,
                 terminal commands, FAQ matching, contact schema, JSON-LD
 store/          Redux store: chat, terminal, projectsFilter slices
-scripts/        assets.mjs (images/OG/CV placeholder), contrast.mjs, qa.mjs
+scripts/        assets.mjs (images/OG/CV placeholder), contrast.mjs, glass-contrast.mjs, render-sculpture.mjs,
+                perf-scroll.mjs, qa.mjs
 ```
 
 ### Design system
@@ -174,7 +234,8 @@ Fonts are self-hosted via `next/font`: Space Grotesk (display), Inter (body) and
 ### Implementation notes
 
 - **Theme.** next-themes (class strategy, light/dark/system) with an inline pre-paint script, so there's no flash. `theme-color` metas follow the OS and switch when a theme is chosen.
-- **Motion.** The hero intro is a CSS keyframe sequence. Scroll reveals use IntersectionObserver with CSS transitions. GSAP + ScrollTrigger (registered once in `lib/gsap.ts`) drives the timeline progress line and the project-filter animation, and is loaded lazily. Lenis starts on idle after load. With `prefers-reduced-motion`, no animations run, Lenis never loads, and everything is visible immediately.
+- **Motion.** The hero intro and preloader are CSS keyframe sequences, so there's no JS on the critical path. GSAP (registered once in `lib/gsap.ts`: ScrollTrigger, SplitText, Flip, `useGSAP`) is only ever imported lazily. Timeline items are the only scroll reveals. Lenis starts on idle after load. With `prefers-reduced-motion` or "Reduce effects", no decorative animation runs, Lenis never loads, and everything is visible immediately.
+- **Pre-paint script** (`app/layout.tsx`): applies the "Reduce effects" preference, marks `html.motion-ok`, and decides whether to show the preloader, all before first paint, so nothing flashes.
 - **Code-splitting.** The terminal, chatbot, Medium feed, project dialog, lightbox, mobile Sheet, contact form and toaster all load with `next/dynamic` (on proximity or first interaction), keeping them out of the initial bundle.
 - **shadcn/ui.** The environment this was built in couldn't reach `ui.shadcn.com`, so components were taken from the official source (`shadcn-ui/ui`, `new-york-v4`, Radix). The code is identical to what `npx shadcn add` produces, and `components.json` is set up so the CLI works normally from now on. One upstream change was needed: in `carousel.tsx`, the initial state sync is deferred a frame to satisfy the React Compiler lint rule `react-hooks/set-state-in-effect`.
 
@@ -197,4 +258,8 @@ npm run qa                       # QA_URL=… to target another URL; QA_DRAFTS=1
 - mobile menu, project dialog, lightbox and chatbot: focus trap, Esc, outside click, focus return
 - every terminal command, history and Tab completion
 - contact form validation
-- reduced motion
+- reduced motion: no preloader, split text, 3D, marquee or blob animation
+- preloader: first view per session only, and never the LCP element
+- 3D: loads after first paint, pauses off-screen and in hidden tabs, fades on scroll, LCP stays the portrait, static fallback (and no three.js download) on ≤ 4-core devices, recolours on theme change without reload
+- theme switch recolours glass, nav and blobs; glass falls back to the solid surface (and stays AA) without `backdrop-filter`
+- "Reduce effects": applied, persisted, disables every effect, reversible

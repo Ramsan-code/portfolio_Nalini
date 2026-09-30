@@ -38,6 +38,12 @@ export const PALETTES: Record<SculptureTheme, { tint: string; room: string; ligh
 
 export const SHAPE = { radius: 1.02, tube: 0.2, p: 2, q: 3 }
 
+/** Performance knobs: pixel-ratio cap and geometry detail (desktop / small screens). */
+export const QUALITY = {
+  maxPixelRatio: 1.5,
+  segments: { desktop: [240, 28], mobile: [120, 12] } as Record<"desktop" | "mobile", [number, number]>,
+}
+
 /**
  * Glass shading. There is deliberately no physical transmission pass: the
  * canvas is transparent over the page, so there is nothing opaque behind the
@@ -95,7 +101,7 @@ export class HeroSculpture {
 
   constructor(canvas: HTMLCanvasElement, opts: SculptureOptions) {
     this.renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" })
-    this.renderer.setPixelRatio(Math.min(Math.max(window.devicePixelRatio || 1, 1), 1.5)) // dpr [1, 1.5]
+    this.renderer.setPixelRatio(Math.min(Math.max(window.devicePixelRatio || 1, 1), QUALITY.maxPixelRatio)) // dpr [1, 1.5]
     this.renderer.outputColorSpace = SRGBColorSpace
     this.renderer.toneMapping = ACESFilmicToneMapping
     this.renderer.setClearColor(0x000000, 0)
@@ -105,7 +111,7 @@ export class HeroSculpture {
     this.scene.add(this.rig)
 
     const glass = withGlassAlpha(new MeshPhysicalMaterial({ ...GLASS, color: 0xffffff }))
-    const [tubular, radial] = opts.lowPoly ? [120, 12] : [240, 28]
+    const [tubular, radial] = QUALITY.segments[opts.lowPoly ? "mobile" : "desktop"]
     this.knot = new Mesh(new TorusKnotGeometry(SHAPE.radius, SHAPE.tube, tubular, radial, SHAPE.p, SHAPE.q), glass)
     this.rig.add(this.knot)
 

@@ -324,6 +324,222 @@ for (const width of [360, 768, 1024, 1440]) {
   await context.close()
 }
 
+// 10. Reduced motion: no preloader, no effects runtime, static marquee ------
+{
+  const { context, page } = await newPage({ reducedMotion: "reduce" })
+  await page.goto(BASE, { waitUntil: "networkidle" })
+  await page.waitForTimeout(3500)
+  const state = await page.evaluate(() => ({
+    preloader: document.documentElement.classList.contains("show-preloader"),
+    splitHeadings: [...document.querySelectorAll("[data-split]")].filter((h) => h.getAttribute("aria-label")).length,
+    marquee: document.querySelector(".marquee-track") ? getComputedStyle(document.querySelector(".marquee-track")).animationName : "none",
+    blobs: getComputedStyle(document.querySelector(".ambient-blob")).animationName,
+    webgl: typeof window.__nrSculpture !== "undefined",
+  }))
+  check("reduced motion: no preloader, no split headings, no 3D", !state.preloader && state.splitHeadings === 0 && !state.webgl, JSON.stringify(state))
+  check("reduced motion: marquee and blobs static", state.marquee === "none" && state.blobs === "none")
+  await context.close()
+}
+
+// 11. Preloader: first view of a session only, never the LCP --------------
+{
+  const { context, page } = await newPage()
+  await context.addInitScript(() => {
+    window.__lcp = []
+    new PerformanceObserver((l) => {
+      for (const e of l.getEntries()) window.__lcp.push(e.element?.getAttribute("alt") ?? e.element?.tagName ?? "?")
+    }).observe({ type: "largest-contentful-paint", buffered: true })
+  })
+  await page.goto(BASE, { waitUntil: "load" })
+  const first = await page.evaluate(() => document.documentElement.classList.contains("show-preloader"))
+  await page.waitForTimeout(1500)
+  const gone = await page.evaluate(() => getComputedStyle(document.querySelector(".preloader")).visibility === "hidden")
+  const lcp = await page.evaluate(() => window.__lcp.at(-1))
+  await page.reload({ waitUntil: "load" })
+  const second = await page.evaluate(() => document.documentElement.classList.contains("show-preloader"))
+  check("preloader shows on first view and hides within 1.5s", first && gone)
+  check("preloader not shown again in the same session", !second)
+  check("LCP element is the portrait", lcp === "Portrait of Nalini Raseekaran", lcp)
+  await context.close()
+}
+
+// 12. 3D fallback (weak devices): static image in a canvas, no three.js ---
+{
+  const { context, page } = await newPage()
+  await context.addInitScript(() => Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 4 }))
+  const chunks = []
+  page.on("response", async (r) => {
+    if (r.url().endsWith(".js") && r.url().includes("/_next/")) chunks.push(await r.text().catch(() => ""))
+  })
+  await page.goto(BASE, { waitUntil: "networkidle" })
+  await page.waitForTimeout(4500)
+  const stage = await page.evaluate(() => {
+    const c = document.querySelector("#home canvas")
+    return c ? { w: c.width, ctx2d: !!c.getContext("2d"), opacity: getComputedStyle(c).opacity } : null
+  })
+  const threeLoaded = chunks.some((t) => t.includes("WebGLRenderer"))
+  check("weak device: static sculpture drawn into a 2D canvas", !!stage && stage.ctx2d && stage.w > 0 && stage.opacity === "1", JSON.stringify(stage))
+  check("weak device: three.js chunk never requested", !threeLoaded)
+  await context.close()
+}
+
+// 13. Live WebGL path (forced with ?effects=full, software GL) ---------------
+{
+  const gl = await chromium.launch({
+    ...(executablePath && { executablePath }),
+    args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"],
+  })
+  const context = await gl.newContext({ viewport: { width: 1280, height: 860 }, colorScheme: "dark" })
+  const page = await context.newPage()
+  await context.addInitScript(() => {
+    window.__lcp = []
+    new PerformanceObserver((l) => {
+      for (const e of l.getEntries()) window.__lcp.push(e.element?.getAttribute("alt") ?? e.element?.tagName ?? "?")
+    }).observe({ type: "largest-contentful-paint", buffered: true })
+  })
+  const t0 = Date.now()
+  let chunkAt = 0
+  page.on("response", async (r) => {
+    if (!chunkAt && r.url().endsWith(".js") && (await r.text().catch(() => "")).includes("WebGLRenderer")) chunkAt = Date.now() - t0
+  })
+  await page.goto(BASE + "?effects=full", { waitUntil: "load" })
+  const loadAt = Date.now() - t0
+  await page.waitForFunction(() => window.__nrSculpture && getComputedStyle(document.querySelector("#home canvas")).opacity === "1", null, { timeout: 90000 })
+  const frames = () => page.evaluate(() => window.__nrSculpture.frames())
+  let a = await frames()
+  await page.waitForTimeout(1500)
+  const onScreen = (await frames()) - a
+  await page.evaluate(() => window.scrollTo(0, 3000))
+  await page.waitForTimeout(800)
+  a = await frames()
+  await page.waitForTimeout(1500)
+  const offScreen = (await frames()) - a
+  const faded = await page.evaluate(() => getComputedStyle(document.querySelector("#home canvas").parentElement).opacity)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await page.waitForTimeout(600)
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", { value: true, configurable: true })
+    document.dispatchEvent(new Event("visibilitychange"))
+  })
+  a = await frames()
+  await page.waitForTimeout(1200)
+  const hidden = (await frames()) - a
+  const lcp = await page.evaluate(() => window.__lcp.at(-1))
+  check("3D chunk loads after first paint/load", chunkAt > 0 && chunkAt >= loadAt, `chunk at ${chunkAt}ms, load at ${loadAt}ms`)
+  check("3D renders on screen", onScreen > 0, `${onScreen} frames/1.5s (software GL)`)
+  check("3D pauses off-screen and fades out", offScreen === 0 && faded === "0", `${offScreen} frames, opacity ${faded}`)
+  check("3D pauses in a hidden tab", hidden === 0)
+  check("LCP stays the portrait with WebGL running", lcp === "Portrait of Nalini Raseekaran", lcp)
+  // Theme switch recolours the live scene without a reload
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", { value: false, configurable: true })
+    document.dispatchEvent(new Event("visibilitychange"))
+  })
+  const navs = await page.evaluate(() => performance.getEntriesByType("navigation").length)
+  await page.getByRole("button", { name: "Light theme" }).first().click()
+  // Re-baking reflections is slow on software GL: allow a few seconds for frames to resume
+  const before = await frames()
+  const resumed = await page
+    .waitForFunction((n) => window.__nrSculpture && window.__nrSculpture.frames() > n + 2, before, { timeout: 15000 })
+    .then(() => true, () => false)
+  const sameDoc = (await page.evaluate(() => performance.getEntriesByType("navigation").length)) === navs && (await page.evaluate(() => !!window.__nrSculpture))
+  const isLight = await page.evaluate(() => document.documentElement.classList.contains("light"))
+  check("theme switch keeps the live 3D scene (no reload)", resumed && sameDoc && isLight, `resumed=${resumed} sameDoc=${sameDoc} light=${isLight}`)
+  await gl.close()
+}
+
+// 14. Theme switch recolours glass and blobs without reload -------------------
+{
+  const { context, page } = await newPage({ colorScheme: "dark" })
+  await page.goto(BASE, { waitUntil: "networkidle" })
+  const read = () =>
+    page.evaluate(() => ({
+      glass: getComputedStyle(document.querySelector(".glass")).backgroundColor,
+      nav: getComputedStyle(document.querySelector(".glass-nav")).backgroundColor,
+      blob: getComputedStyle(document.documentElement).getPropertyValue("--blob-1").trim(),
+    }))
+  const dark = await read()
+  await page.getByRole("button", { name: "Light theme" }).first().click()
+  await page.waitForTimeout(500)
+  const light = await read()
+  check("theme switch recolours glass, nav and blobs", dark.glass !== light.glass && dark.nav !== light.nav && dark.blob !== light.blob, `${dark.glass} → ${light.glass}; blob ${dark.blob} → ${light.blob}`)
+  await context.close()
+}
+
+// 15. Glass fallback when backdrop-filter is unsupported ----------------------
+{
+  const { context, page } = await newPage({ colorScheme: "dark" })
+  await page.goto(BASE, { waitUntil: "networkidle" })
+  const result = await page.evaluate(() => {
+    // Find the @supports not (backdrop-filter) block and force-apply its rules
+    const rules = []
+    for (const sheet of document.styleSheets) {
+      let list
+      try { list = sheet.cssRules } catch { continue }
+      const walk = (rs) => {
+        for (const r of rs) {
+          if (r instanceof CSSSupportsRule && /not/.test(r.conditionText) && /backdrop-filter/.test(r.conditionText)) rules.push(r)
+          else if (r.cssRules) walk(r.cssRules)
+        }
+      }
+      walk(list)
+    }
+    if (!rules.length) return { found: false }
+    const style = document.createElement("style")
+    // Same cascade layer as the real rule (layered !important beats unlayered)
+    style.textContent = "@layer components {" + rules.map((r) => [...r.cssRules].map((x) => x.cssText).join("\n")).join("\n") +
+      "\n.glass,.glass-strong,.glass-nav,.glass-terminal{-webkit-backdrop-filter:none;backdrop-filter:none}}" +
+      // Read final values, not the start of a colour transition
+      "\n*{transition:none!important}"
+    document.head.append(style)
+    const surface = getComputedStyle(document.documentElement).getPropertyValue("--surface").trim()
+    const bg = getComputedStyle(document.querySelector(".glass")).backgroundColor
+    return { found: true, condition: rules[0].conditionText, bg, surface }
+  })
+  check("glass fallback rule exists (@supports not backdrop-filter)", result.found, result.condition)
+  check("glass falls back to the solid surface colour", result.found && result.bg === "rgb(18, 24, 33)", `${result.bg} (surface ${result.surface})`)
+  const { violations } = await new AxeBuilder({ page }).withTags(["wcag2aa"]).withRules(["color-contrast"]).analyze()
+  check("contrast still AA with the glass fallback", violations.length === 0, violations.map((v) => v.nodes.length).join(","))
+  await context.close()
+}
+
+// 16. "Reduce effects" toggle ------------------------------------------------
+{
+  const { context, page } = await newPage()
+  await page.goto(BASE, { waitUntil: "networkidle" })
+  await page.waitForTimeout(1500)
+  const toggle = page.getByRole("switch", { name: /Reduce effects/ })
+  await toggle.click()
+  await page.waitForTimeout(2500)
+  const on = await page.evaluate(() => ({
+    attr: document.documentElement.dataset.effects,
+    stored: localStorage.getItem("nr-effects"),
+    ambient: getComputedStyle(document.querySelector(".ambient")).display,
+    lenis: document.documentElement.classList.contains("lenis"),
+    motionOk: document.documentElement.classList.contains("motion-ok"),
+    split: [...document.querySelectorAll("[data-split]")].filter((h) => h.getAttribute("aria-label")).length,
+    webgl: typeof window.__nrSculpture !== "undefined",
+    marquee: getComputedStyle(document.querySelector(".marquee-track")).animationName,
+    float: getComputedStyle(document.querySelector(".animate-float")).animationName,
+  }))
+  check("reduce effects: preference stored and applied", (await toggle.getAttribute("aria-checked")) === "true" && on.attr === "reduced" && on.stored === "reduced")
+  check(
+    "reduce effects: blobs, Lenis, reveals, split text, 3D, marquee, float all off",
+    on.ambient === "none" && !on.lenis && !on.motionOk && on.split === 0 && !on.webgl && on.marquee === "none" && on.float === "none",
+    JSON.stringify(on)
+  )
+  await page.reload({ waitUntil: "networkidle" })
+  const persisted = await page.evaluate(() => ({
+    attr: document.documentElement.dataset.effects,
+    preloader: document.documentElement.classList.contains("show-preloader"),
+  }))
+  check("reduce effects: remembered after reload, no preloader", persisted.attr === "reduced" && !persisted.preloader)
+  await page.getByRole("switch", { name: /Reduce effects/ }).click()
+  await page.waitForTimeout(300)
+  check("reduce effects: can be switched back off", (await page.evaluate(() => document.documentElement.dataset.effects)) === undefined)
+  await context.close()
+}
+
 await browser.close()
 const failed = results.filter((r) => !r.ok)
 console.log(`\n${results.length - failed.length}/${results.length} checks passed`)

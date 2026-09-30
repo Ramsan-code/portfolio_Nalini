@@ -3,6 +3,10 @@
 import { prefersReducedMotion } from "./motion"
 import { isEffectsReduced } from "./effects"
 
+/** Tuning: devices below these (i.e. ≤ 4 cores or ≤ 4 GB RAM) get the static sculpture image. */
+export const MIN_CPU_CORES_FOR_3D = 5
+export const MIN_MEMORY_GB_FOR_3D = 5
+
 export type Render3DDecision = { webgl: true } | { webgl: false; reason: string }
 
 interface NavigatorWithMemory extends Navigator {
@@ -36,7 +40,7 @@ export function decideHero3D(): Render3DDecision {
   if (override === "full") return { webgl: true }
 
   const nav = navigator as NavigatorWithMemory
-  if ((nav.hardwareConcurrency ?? 8) <= 4) return { webgl: false, reason: "low-cpu" }
-  if (nav.deviceMemory !== undefined && nav.deviceMemory <= 4) return { webgl: false, reason: "low-memory" }
+  if ((nav.hardwareConcurrency ?? 8) < MIN_CPU_CORES_FOR_3D) return { webgl: false, reason: "low-cpu" }
+  if (nav.deviceMemory !== undefined && nav.deviceMemory < MIN_MEMORY_GB_FOR_3D) return { webgl: false, reason: "low-memory" }
   return { webgl: true }
 }

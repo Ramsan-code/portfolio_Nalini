@@ -8,8 +8,8 @@ import { useRichMotion } from "@/lib/effects"
 const EffectsRuntime = dynamic(() => import("./EffectsRuntime"), { ssr: false })
 
 /**
- * Mounts the effects runtime once the page is idle after load, and only when
- * decorative motion is allowed (no OS reduced motion, "Reduce effects" off).
+ * Mounts the effects runtime on the first interaction (or 4s after load), and
+ * only when decorative motion is allowed (no OS reduced motion, effects on).
  * Also pauses CSS decorative loops while the tab is hidden.
  */
 export function EffectsLoader() {
@@ -25,21 +25,32 @@ export function EffectsLoader() {
     return () => document.removeEventListener("visibilitychange", onVisibility)
   }, [])
 
+  // Nothing in the runtime is needed before the visitor does something (its
+  // headings are below the fold; magnetic/parallax respond to input), so it
+  // loads on the first interaction, or after load + 4s idle at the latest.
   useEffect(() => {
-    let id = 0
-    const start = () => {
-      id =
-        typeof window.requestIdleCallback === "function"
-          ? window.requestIdleCallback(() => setReady(true), { timeout: 2000 })
-          : window.setTimeout(() => setReady(true), 800)
+    const events = ["pointermove", "pointerdown", "scroll", "keydown", "touchstart", "wheel"] as const
+    let timer = 0
+    let idle = 0
+    const go = () => {
+      cleanup()
+      setReady(true)
     }
-    if (document.readyState === "complete") start()
-    else window.addEventListener("load", start, { once: true })
-    return () => {
-      window.removeEventListener("load", start)
-      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(id)
-      window.clearTimeout(id)
+    const cleanup = () => {
+      events.forEach((e) => window.removeEventListener(e, go))
+      window.removeEventListener("load", onLoad)
+      window.clearTimeout(timer)
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle)
     }
+    const onLoad = () => {
+      timer = window.setTimeout(() => {
+        idle = typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(go, { timeout: 2000 }) : window.setTimeout(go, 0)
+      }, 4000)
+    }
+    events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }))
+    if (document.readyState === "complete") onLoad()
+    else window.addEventListener("load", onLoad, { once: true })
+    return cleanup
   }, [])
 
   return ready && rich ? <EffectsRuntime /> : null

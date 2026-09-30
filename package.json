@@ -11,7 +11,9 @@
     "images": "node scripts/assets.mjs",
     "contrast": "node scripts/contrast.mjs",
     "qa": "node scripts/qa.mjs",
-    "sculpture": "node scripts/render-sculpture.mjs"
+    "sculpture": "node scripts/render-sculpture.mjs",
+    "perf:scroll": "node scripts/perf-scroll.mjs",
+    "glass-contrast": "node scripts/glass-contrast.mjs"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",

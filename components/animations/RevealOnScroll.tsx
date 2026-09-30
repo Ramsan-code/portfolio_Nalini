@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { useReducedMotion } from "@/lib/motion"
+import { useRichMotion } from "@/lib/effects"
 
 declare global {
   interface Window {
@@ -17,12 +17,12 @@ declare global {
  * removes it again if this never runs, so content can't stay hidden.
  */
 export function RevealOnScroll() {
-  const reduced = useReducedMotion()
+  const rich = useRichMotion()
 
   useEffect(() => {
     const root = document.documentElement
     window.__nrReveal = true
-    if (reduced) {
+    if (!rich) {
       root.classList.remove("motion-ok")
       return
     }
@@ -45,7 +45,7 @@ export function RevealOnScroll() {
     )
     document.querySelectorAll("[data-reveal]:not(.is-revealed)").forEach((el) => io.observe(el))
     return () => io.disconnect()
-  }, [reduced])
+  }, [rich])
 
   return null
 }

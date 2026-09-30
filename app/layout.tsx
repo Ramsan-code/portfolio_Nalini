@@ -76,10 +76,10 @@ export const viewport: Viewport = {
 
 // Runs before paint:
 // 1. Applies the "Reduce effects" preference (html[data-effects="reduced"]).
-// 2. Only when motion is allowed: marks <html> so reveal targets start hidden
-//    (un-hidden after 4s if the animation code never loads), and shows the
-//    preloader on the first page view of the session (unless effects are reduced).
-const motionScript = `(function(){try{var d=document.documentElement,r=false;try{r=localStorage.getItem('nr-effects')==='reduced'}catch(e){}if(r)d.dataset.effects='reduced';if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('motion-ok');setTimeout(function(){if(!window.__nrReveal)d.classList.remove('motion-ok')},4000);if(!r){try{if(!sessionStorage.getItem('nr-preloaded')){sessionStorage.setItem('nr-preloaded','1');d.classList.add('show-preloader')}}catch(e){}}}}catch(e){}})()`
+// 2. Only when motion is allowed and effects aren't reduced: marks <html> so
+//    reveal targets start hidden (un-hidden after 4s if the animation code
+//    never loads), and shows the preloader on the session's first page view.
+const motionScript = `(function(){try{var d=document.documentElement,r=false;try{r=localStorage.getItem('nr-effects')==='reduced'}catch(e){}if(r)d.dataset.effects='reduced';if(!r&&!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('motion-ok');setTimeout(function(){if(!window.__nrReveal)d.classList.remove('motion-ok')},4000);try{if(!sessionStorage.getItem('nr-preloaded')){sessionStorage.setItem('nr-preloaded','1');d.classList.add('show-preloader')}}catch(e){}}}catch(e){}})()`
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const jsonLd = buildJsonLd()

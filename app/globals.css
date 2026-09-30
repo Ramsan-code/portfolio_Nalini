@@ -193,6 +193,14 @@
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     backdrop-filter: blur(20px) saturate(160%);
   }
+  /* Limit backdrop repaints to each panel's own box. Not on .glass-edge:
+     paint containment would clip the gradient border drawn over the border box. */
+  .glass:not(.glass-edge),
+  .glass-strong:not(.glass-edge),
+  .glass-nav,
+  .glass-terminal {
+    contain: paint;
+  }
   /* 1px gradient border (mask-composite). Featured elements only. */
   .glass-edge {
     position: relative;

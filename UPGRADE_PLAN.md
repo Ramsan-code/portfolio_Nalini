@@ -1,6 +1,6 @@
 # Upgrade plan: "Liquid glass over a living gradient"
 
-Status: **waiting for "go"**. Nothing below has been built yet.
+Status: **built with Option B**. Results: UPGRADE_REPORT.md.
 
 ## 0. What exists today (read before planning)
 
