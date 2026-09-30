@@ -1,0 +1,193 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ------------------------------------------------------------------
+   Design tokens. :root = light, .dark = dark.
+   shadcn variables are aliased to these so every component follows them.
+   ------------------------------------------------------------------ */
+:root {
+  --bg: #f0eee9;
+  --surface: #ffffff;
+  --border: #e4e1da;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --accent: #0f766e;
+  --accent-2: #1d4ed8;
+  --on-accent: #ffffff;
+  --gradient: linear-gradient(135deg, #0f766e 0%, #800000 55%, #7e22ce 100%);
+  --glass: rgb(255 255 255 / 0.72);
+
+  /* shadcn aliases */
+  --radius: 0.75rem;
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: var(--on-accent);
+  --secondary: color-mix(in oklab, var(--accent-2) 10%, var(--surface));
+  --secondary-foreground: var(--text);
+  --muted: color-mix(in oklab, var(--text) 5%, var(--surface));
+  --muted-foreground: var(--text-muted);
+  --accent-soft: color-mix(in oklab, var(--accent) 10%, var(--surface));
+  --destructive: #b91c1c;
+  --input: var(--border);
+  --ring: var(--accent);
+}
+
+.dark {
+  --bg: #0b0f14;
+  --surface: #121821;
+  --border: #1f2a37;
+  --text: #f0eee9;
+  --text-muted: #9aa4b2;
+  --accent: #2dd4bf;
+  --accent-2: #f472b6;
+  --on-accent: #0b0f14;
+  --gradient: linear-gradient(135deg, #2dd4bf 0%, #b0304a 55%, #a855f7 100%);
+  --glass: rgb(18 24 33 / 0.7);
+  --destructive: #f87171;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  /* shadcn uses `accent` for hover backgrounds; ours is a soft teal tint */
+  --color-accent: var(--accent-soft);
+  --color-accent-foreground: var(--text);
+  --color-brand: var(--accent);
+  --color-brand-2: var(--accent-2);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --animate-spin-slow: spin 8s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-blink: blink 1.1s step-end infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+    line-height: 1.15;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+  .section {
+    @apply py-20 sm:py-24 lg:py-28;
+  }
+  .prose-width {
+    max-width: 68ch;
+  }
+  .text-gradient {
+    background-image: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-gradient-brand {
+    background-image: var(--gradient);
+  }
+  .glass {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+  }
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.2em] text-primary;
+  }
+  .h1-fluid {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .h2-fluid {
+    font-size: clamp(1.875rem, 4vw, 3rem);
+  }
+  /* Rotating conic-gradient ring around the hero portrait */
+  .ring-conic {
+    background: conic-gradient(from 0deg, var(--accent), #b0304a, #a855f7, var(--accent));
+  }
+  :root:not(.dark) .ring-conic {
+    background: conic-gradient(from 0deg, var(--accent), #800000, #7e22ce, var(--accent));
+  }
+}
+
+/* Reveal: content is visible by default. Only once JS confirms motion is
+   allowed does <html> get .motion-ok, and then GSAP animates it in. */
+.motion-ok [data-reveal] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .motion-ok [data-reveal] {
+    opacity: 1;
+  }
+}
+
+/* Lenis recommended styles */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
