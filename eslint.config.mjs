@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Separate Flutter + Firebase project with its own tooling.
+    "shop_companion/**",
   ]),
 ]);
 
