@@ -60,7 +60,21 @@ export function Journey() {
                     )}
                   </div>
                   <h3 className="mt-3 font-display text-xl font-semibold">{item.title}</h3>
-                  {item.organisation && <p className="mt-1 text-muted-foreground">{item.organisation}</p>}
+                  {item.organisation && (
+                    item.organisationUrl ? (
+                      <a
+                        href={item.organisationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 inline-flex items-center gap-1 text-muted-foreground underline-offset-4 hover:underline"
+                      >
+                        {item.organisation}
+                        <ExternalLink className="size-3.5" aria-hidden="true" />
+                      </a>
+                    ) : (
+                      <p className="mt-1 text-muted-foreground">{item.organisation}</p>
+                    )
+                  )}
                   {item.summary && <p className="prose-width mt-3 text-sm text-muted-foreground">{item.summary}</p>}
 
                   {item.results && item.results.length > 0 && (

@@ -5,10 +5,10 @@ export const profile: Profile = {
   shortName: "Nalini",
   initials: "NR",
   role: "Software Developer & UI/UX Designer",
-  roles: ["Software Developer", "UI/UX Designer"],
+  roles: ["Software Developer", "UI/UX Designer", "Financial & Business Tech"],
   valueStatement:
-    "I design intuitive, user-centred digital products, and my development background lets me carry them from Figma to working code.",
-  bio: "BIT undergraduate and former UI/UX Design Intern, skilled in Figma, wireframing and prototyping. I design intuitive, user-centered digital products, and my software development background helps me bridge design and engineering.",
+    "I design intuitive, user-centred digital experiences and build software solutions that connect good design with business, finance, and real-world user needs.",
+  bio: "BIT undergraduate with a commerce background and a strong interest in financial and business technology. I’m skilled in Figma, wireframing, prototyping, and software development, and I enjoy creating digital products that are both user-friendly and meaningful for real-world business contexts.",
   location: "Vavuniya, Sri Lanka",
   email: "naliniraseekaran1972@gmail.com",
   phoneDisplay: "+94 76 207 0890",

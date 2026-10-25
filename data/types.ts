@@ -87,6 +87,7 @@ export interface TimelineItem {
   period: string
   title: string
   organisation: string
+  organisationUrl?: string
   location?: string
   summary?: string
   /** Subject results, shown in a compact list */

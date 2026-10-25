@@ -48,16 +48,16 @@ export const timeline: TimelineItem[] = [
   {
     id: "olinethra",
     kind: "experience",
-    // TODO: confirm end date (the bio says "former" intern)
     period: "Sep 2026 – Present",
-    // TODO: confirm job title
     title: "UI/UX Design Intern",
     organisation: "Olinethra",
+    organisationUrl: "https://olinethra.com",
     current: true,
+    summary: "Designing user-friendly digital experiences for olinethra.com and supporting product-focused interface improvements.",
     highlights: [
-      "TODO: responsibility or achievement 1",
-      "TODO: responsibility or achievement 2",
-      "TODO: responsibility or achievement 3",
+      "Contribute to UI/UX design and product thinking for web experiences.",
+      "Translate business goals and user needs into cleaner, more intuitive interfaces.",
+      "Support design iteration, wireframing, and refinement in a real-world product environment.",
     ],
   },
 ]

@@ -2,18 +2,18 @@ import type { SkillGroup, SoftSkill, SpokenLanguage, Stat } from "./types"
 
 /** Tech stack, grouped. Groups with no real items are hidden. */
 export const techStack: SkillGroup[] = [
-  { label: "Languages", items: ["TODO: add languages (e.g. JavaScript, Java)"] },
-  { label: "Frameworks", items: ["TODO: add frameworks"] },
-  { label: "Libraries", items: ["TODO: add libraries"] },
+  { label: "Languages", items: ["JavaScript", "Java", "HTML", "CSS", "PHP"] },
+  { label: "Frameworks", items: ["Bootstrap", "Tailwind CSS"] },
+  { label: "Libraries", items: ["React"] },
 ]
 
 /** Design & dev tools. Figma first. */
 export const tools: string[] = [
   "Figma",
+  "Google Stitch",
   "VS Code",
   "Git",
   "Photoshop",
-  // TODO: confirm the list above and add more tools
 ]
 
 export const softSkills: SoftSkill[] = [
@@ -25,11 +25,15 @@ export const softSkills: SoftSkill[] = [
 ]
 
 export const businessCompetencies: string[] = [
-  "TODO: add business competencies",
+  "Business understanding",
+  "User-centered thinking",
+  "Product awareness",
+  "Process organisation",
 ]
 
 export const spokenLanguages: SpokenLanguage[] = [
-  { name: "TODO: add language", level: "TODO: level (e.g. Native, Fluent)" },
+  { name: "Tamil", level: "Native" },
+  { name: "English", level: "Fluent" },
 ]
 
 /** Optional stats tile. Hidden while empty. Only add numbers you can back up. */
