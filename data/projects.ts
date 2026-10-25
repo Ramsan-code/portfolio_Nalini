@@ -29,9 +29,23 @@ export const projects: Project[] = [
       "This was my very first hands-on experience with vibe coding: building a real e-commerce website alongside AI instead of starting from a blank page. I designed and launched Uki with a clean modern storefront, category navigation, product discovery, and a working cart in a single intensive bootcamp session. The experience transformed how I think about building digital products—what once felt out of reach suddenly became possible with the right prompts, tools, and iteration flow.",
     role: "Designer + front-end builder / beginner AI developer",
     tech: ["Next.js", "TypeScript", "React", "Tailwind CSS", "Supabase", "Vercel", "AI prompting", "Codex"],
-    cover: placeholder(1),
-    gallery: [placeholder(1), placeholder(2), placeholder(3)],
-    liveUrl: "https://lnkd.in/dAXHT5i3",
+    cover: {
+      src: "/images/projects/placeholder-1.png",
+      alt: "Uki storefront hero section",
+      width: 1024,
+      height: 1024,
+    },
+    gallery: [
+      {
+        src: "/images/projects/placeholder-1.png",
+        alt: "Uki storefront hero section",
+        width: 1024,
+        height: 1024,
+      },
+      placeholder(2),
+      placeholder(3),
+    ],
+    liveUrl: "https://polyglot-mocha-zeta.vercel.app/",
     caseStudy: {
       problem:
         "As a complete beginner, the main challenge was turning an idea into a working product without years of coding experience. I wanted to learn how to use AI tools to accelerate product creation while still building something useful and realistic.",
