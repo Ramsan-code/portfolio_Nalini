@@ -21,17 +21,27 @@ const placeholder = (n: number) => ({
  */
 export const projects: Project[] = [
   {
-    slug: "web-project",
-    title: "TODO: Web project title",
+    slug: "uki-ecommerce",
+    title: "Uki — AI-assisted E-commerce storefront",
     category: "web",
-    summary: "TODO: one-line summary",
-    description: "TODO: add project description",
-    role: "TODO: your role",
-    tech: ["TODO: tech"],
+    summary: "A dark-themed, multi-category storefront with product search, filtering, and a working cart built in one day using AI-assisted development.",
+    description:
+      "This was my very first hands-on experience with vibe coding: building a real e-commerce website alongside AI instead of starting from a blank page. I designed and launched Uki with a clean modern storefront, category navigation, product discovery, and a working cart in a single intensive bootcamp session. The experience transformed how I think about building digital products—what once felt out of reach suddenly became possible with the right prompts, tools, and iteration flow.",
+    role: "Designer + front-end builder / beginner AI developer",
+    tech: ["Next.js", "TypeScript", "React", "Tailwind CSS", "Supabase", "Vercel", "AI prompting", "Codex"],
     cover: placeholder(1),
-    liveUrl: "TODO: live URL",
-    githubUrl: "TODO: GitHub URL",
-    draft: true,
+    gallery: [placeholder(1), placeholder(2), placeholder(3)],
+    liveUrl: "https://lnkd.in/dAXHT5i3",
+    caseStudy: {
+      problem:
+        "As a complete beginner, the main challenge was turning an idea into a working product without years of coding experience. I wanted to learn how to use AI tools to accelerate product creation while still building something useful and realistic.",
+      research:
+        "I explored how modern e-commerce storefronts are structured, including category-based shopping, hero layouts, search flows, and cart UX. I focused on creating a clean dark theme and straightforward shopping path that felt polished and easy to use.",
+      wireframes:
+        "I sketched the basic user flow around product discovery, category selection, and checkout-readiness, then iterated quickly with AI suggestions to refine the layout and interface details.",
+      finalDesign:
+        "The final result was a live multi-category storefront for Electronics, Fashion, Home & Living, and Groceries, featuring modern visuals, search, category navigation, and a functioning cart. It was deployed on Vercel and became a real proof that AI-assisted development can help beginners build practical products fast.",
+    },
   },
   {
     slug: "uiux-case-study",
